@@ -1,7 +1,6 @@
 import mysql.connector
-from random import randint
-from fastapi import FastAPI, Form, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
@@ -25,22 +24,31 @@ async def root():
 # ------------------------ PERSON/ FUNCTIONS ------------------------
 def generate_PID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT p_id FROM people LIMIT 1")
+    cursor.execute(f"SELECT p_id FROM people order by p_id asc LIMIT 1")
     last_pid = int(cursor.fetchall()[0][0][1:])
     new_pid = 'P' + str(last_pid - 1)
+    cursor.close()
     return new_pid
+
+def generate_PetID() :
+    cursor = db.cursor()
+    cursor.execute(f"SELECT pet_id FROM pets order by p_id asc LIMIT 1")
+    last_id = int(cursor.fetchall()[0][0][2:])
+    new_id = 'PE' + str(last_id - 1)
+    cursor.close()
+    return new_id
+
 
 # To render user registration form
 @app.get("/user/add", response_class=HTMLResponse)
-async def registration_form(request: Request):
+async def render_user_add(request: Request):
     return templates.TemplateResponse("userForm.html", {"request": request})
 
 # To add user to DB
-@app.post("/user/add/")
+@app.post("/user/add")
 async def user_add(request : Request):
     form_data = await request.form()
     p_id = generate_PID()
-
     data = list(value for key, value in form_data.items())
     data.insert(0, p_id)
     data = tuple(data)
@@ -56,25 +64,53 @@ async def user_add(request : Request):
 
 # To render user login form
 @app.get("/user/login", response_class=HTMLResponse)
-async def registration_form(request: Request):
+async def render_user_login(request: Request):
     return templates.TemplateResponse("userLogin.html", {"request": request})
 
 # To verify user from DB
-@app.post("/user/login")
+@app.post("/user/login", response_class=RedirectResponse)
 async def user_login(request : Request) :
     form_data = await request.form()
-    id, pwd = (value for key, value in form_data.items())
+    p_id, pwd = (value for key, value in form_data.items())
 
     cursor = db.cursor()
     sql = "SELECT p_password FROM people WHERE p_id = %s"
-    cursor.execute(sql, (id,))
+    cursor.execute(sql, (p_id,))
     res = cursor.fetchall()
-    if res[0][0] == pwd :
-        return {"message" : "user verification SUCCESSFUL!"}
-    return {"message" : "user verification FAILED"}
-    
-# @app.get("/user/homepage/{p_id}", response_class=HTMLResponse)
-# async def registration_form(request: Request):
-#     return templates.TemplateResponse("userHomePage.html", {"request": request})
+    cursor.close()
 
-    
+    if res[0][0] == pwd :
+        # Default redirect makes POST request, changing status code match GET
+        return RedirectResponse(url=f'/user/homepage/{p_id}', status_code=302)
+    else :
+        return templates.TemplateResponse("invalid.html", context={"request" : request})
+
+# To view user/pet owner details and link to add pets
+@app.get("/user/homepage/{p_id}", response_class=HTMLResponse)
+async def user_homepage(request: Request, p_id:str):
+    # Retrieving user details to display
+    cursor = db.cursor()
+    sql = f"SELECT * FROM people WHERE p_id = %s"
+    cursor.execute(sql, (p_id,))
+    res = cursor.fetchone()
+
+    return templates.TemplateResponse("userHomePage.html", {"request": request, "res" : res})
+
+# To render pet registration form for a user
+@app.get("/pet/add", response_class=HTMLResponse)
+async def render_pet_add(request: Request, p_id):
+    return templates.TemplateResponse("petForm.html", {"request": request, "p_id" : p_id})
+
+# To actually add
+@app.post("/pet/add")
+async def pet_add(request : Request) :
+    pet_id = generate_PetID()
+    form_data = await request.form()
+    data = (pet_id,) + tuple((value for key, value in form_data.items()))
+
+    cursor = db.cursor()
+    sql = 'INSERT INTO pets (pet_id, p_id, pet_name, pet_species, pet_breed, pet_gender, pet_dob) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+    return {"Message" : "Successfully added pet!"}

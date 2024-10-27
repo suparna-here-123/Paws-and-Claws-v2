@@ -5,6 +5,9 @@
     <title>User Home Page </title>
 </head>
 <body>
-    <h2>THIS IS THE USER'S HOME PAGE</h2>
+    <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
+    <h3>Username : {{ res[0] }}</h3>
+
+    <a href="/pet/add?p_id={{ res[0] }}">Add pet</a>
 </body>
 </html>

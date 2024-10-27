@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Registration Form</title>
+</head>
+<body>
+    <h2>Pet of {{ p_id }}</h2>
+    <form action="/pet/add" method="post">
+        <label for="Owner">Owner</label>
+        <input type="text" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
+
+        <label for="Pet Name">Pet Name</label>
+        <input type="text" id="pet_name" name="pet_name"><br><br>
+
+        <label for="Pet Species">Pet Species</label>
+        <input type="text" id="pet_species" name="pet_species"><br><br>
+
+        <label for="Pet Breed">Pet Breed</label>
+        <input type="text" id="pet_breed" name="pet_breed"><br><br>
+
+        <label for="Pet Gender">Pet Gender</label><br>
+        <input type="radio" id="pet_gender" name="pet_gender" value="F">
+        <label for="Female">Female</label><br>
+        <input type="radio" id="pet_gender" name="pet_gender" value="M">
+        <label for="Male">Male</label><br>
+            
+
+        <label for="Pet DOB">Pet DOB</label>
+        <input type="date" id="pet_dob" name="pet_dob"><br><br>
+
+
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>
