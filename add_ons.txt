@@ -1,0 +1,21 @@
+-> Sign up form for parent -> exists
+
+
+Requirements :
+1) From UserHomePage.js -> Sign up form for pet from parent account
+
+2) SignUpForm.js -> Add button for Parent/Vet in sign up form
+		 -> Introduce corresponding fields depending on the choice
+		 -> Radio button for doctor : clinic admin / not
+
+3) ApptForm.js -> see and choose nearby clinics + doctors (based on locality)
+		  choose pet
+
+4) VetHomePage.js -> Cancel (ONLY BEFORE 30 MINS)
+		  -> View vaccination history of patient
+		  -> Update vaccination history of patient
+
+5) EditProfile.js -> Provision to edit SEPARATELY for 
+			* parent -> everything
+			* pet -> everything
+			 pet and vet CLINIC ADMIN
