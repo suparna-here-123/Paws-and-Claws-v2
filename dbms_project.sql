@@ -68,18 +68,3 @@ appt_reason enum("Emergency", "Vaccination", "Routine"),
 foreign key (c_id) references clinics(c_id),
 foreign key (vet_id) references vets(vet_id),
 foreign key(pet_id) references pets(pet_id));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

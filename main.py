@@ -31,13 +31,13 @@ def generate_PID() :
     return new_pid
 
 # To render user registration form
-@app.get("/register", response_class=HTMLResponse)
+@app.get("/user/add", response_class=HTMLResponse)
 async def registration_form(request: Request):
-    return templates.TemplateResponse("form.html", {"request": request})
+    return templates.TemplateResponse("userForm.html", {"request": request})
 
 # To add user to DB
 @app.post("/user/add/")
-async def submit_form(request : Request):
+async def user_add(request : Request):
     form_data = await request.form()
     p_id = generate_PID()
 
@@ -46,9 +46,35 @@ async def submit_form(request : Request):
     data = tuple(data)
 
     cursor = db.cursor()
-    sql = "INSERT INTO PEOPLE VALUE (%s, %s, %s, %s, %s, %s, %s)"
+    sql = "INSERT INTO PEOPLE VALUE (%s, %s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
+    cursor.close()
 
-    return {"Message" : "Successfully added user!"}
+    # This p_id will be used for login later
+    return {"Message" : "Successfully added user!", "User ID" : p_id}
 
+# To render user login form
+@app.get("/user/login", response_class=HTMLResponse)
+async def registration_form(request: Request):
+    return templates.TemplateResponse("userLogin.html", {"request": request})
+
+# To verify user from DB
+@app.post("/user/login")
+async def user_login(request : Request) :
+    form_data = await request.form()
+    id, pwd = (value for key, value in form_data.items())
+
+    cursor = db.cursor()
+    sql = "SELECT p_password FROM people WHERE p_id = %s"
+    cursor.execute(sql, (id,))
+    res = cursor.fetchall()
+    if res[0][0] == pwd :
+        return {"message" : "user verification SUCCESSFUL!"}
+    return {"message" : "user verification FAILED"}
+    
+# @app.get("/user/homepage/{p_id}", response_class=HTMLResponse)
+# async def registration_form(request: Request):
+#     return templates.TemplateResponse("userHomePage.html", {"request": request})
+
+    
