@@ -7,7 +7,7 @@
 <body>
     <h2>Pet of {{ p_id }}</h2>
 
-    <form action="{{ endpoint }}" method="post">
+    <form action="/pet/add" method="post">
         <label for="Owner">Owner</label>
         <input type="text" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
 
@@ -30,6 +30,16 @@
         <label for="Pet DOB">Pet DOB</label>
         <input type="date" id="pet_dob" name="pet_dob"><br><br>
 
+        <label for="Pet Vaccination History">Pet Vaccination History</label><br>
+        <input type="radio" id="pet_vac" name="pet_vac" value="Rabies">
+        <label for="Rabies">Rabies</label><br>
+        <input type="radio" id="pet_vac" name="pet_vac" value="Flu">
+        <label for="Flu">Flu</label><br>
+        <input type="radio" id="pet_vac" name="pet_vac" value="S3P">
+        <label for="S3P">S3P</label><br>
+
+        <label for="Vaccination Date">Vaccination Date</label>
+        <input type="date" id="vac_date" name="vac_date"><br><br>
 
         <button type="submit">Submit</button>
     </form>

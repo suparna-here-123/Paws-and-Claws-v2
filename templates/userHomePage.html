@@ -6,10 +6,36 @@
 </head>
 <body>
     <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
-    <h3>Username : {{ res[0] }}</h3>
 
-    <a href="/pet/add?p_id={{ res[0] }}&endpoint=/pet/add">Add pet</a>
-    <a href="/pet/view?p_id={{ res[0] }}">View pets</a>
+    <a href="/pet/add?p_id={{ res[0] }}">
+        <button style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Add pet
+        </button>
+    </a>
+
+    <a href="/pet/view?p_id={{ res[0] }}">
+    <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        View pets
+    </button>
+    </a>
+
+    <a href="/user/edit?p_id={{ res[0] }}">
+        <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Edit Profile
+        </button>
+    </a>
+
+    <!-- Wrapping button inside form coz that's the only way to send post request-->
+    <form action="/user/delete" method="POST" style="display: inline;">
+        <input type="hidden" name="p_id" value="{{ res[0] }}">
+        <button type="submit" style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Delete Profile
+        </button>
+    </form>
+
+    
+
+
     
 </body>
 </html>

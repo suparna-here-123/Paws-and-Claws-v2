@@ -8,7 +8,8 @@ p_lastName varchar(25),
 p_phone BIGINT unique,
 p_locality varchar(25),
 p_street varchar(25),
-p_houseNum int);
+p_houseNum int,
+);
 
 create table if not exists vets (
 vet_id varchar(5) primary key,		-- VXXX
@@ -30,8 +31,8 @@ pet_breed varchar(25),
 pet_gender enum("M", "F"),
 pet_dob date,
 appt_id varchar(5),
-foreign key(p_id) references people(p_id),
-foreign key (vet_id) references vets(vet_id)); -- Upcoming appointment du ID
+foreign key(p_id) references people(p_id) on delete cascade,
+foreign key (vet_id) references vets(vet_id) on delete cascade); -- Upcoming appointment du ID
 
 create table if not exists vaccinations (
 vac_id varchar(5),				-- VAXX
@@ -39,7 +40,7 @@ pet_id varchar(5),
 primary key (vac_id, pet_id),
 vac_name enum("Rabies", "Flu", "S3P"),
 vac_date date,
-foreign key (pet_id) references pets(pet_id));
+foreign key (pet_id) references pets(pet_id) on delete cascade);
 
 create table if not exists clinics (
 c_id varchar(5) primary key,	-- CXXX
@@ -53,8 +54,8 @@ c_closesAt time);
 create table if not exists employments(
 c_id varchar(5),				
 vet_id varchar(5),
-foreign key (c_id) references clinics(c_id),
-foreign key (vet_id) references vets(vet_id),
+foreign key (c_id) references clinics(c_id) on delete cascade,
+foreign key (vet_id) references vets(vet_id) on delete cascade,
 primary key (c_id, vet_id));
 
 
@@ -65,6 +66,6 @@ vet_id varchar(5),
 pet_id varchar(5),
 appt_time time,
 appt_reason enum("Emergency", "Vaccination", "Routine"),
-foreign key (c_id) references clinics(c_id),
-foreign key (vet_id) references vets(vet_id),
-foreign key(pet_id) references pets(pet_id));
+foreign key (c_id) references clinics(c_id) on delete cascade,
+foreign key (vet_id) references vets(vet_id) on delete cascade,
+foreign key(pet_id) references pets(pet_id) on delete cascade);

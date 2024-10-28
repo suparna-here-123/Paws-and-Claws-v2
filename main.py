@@ -24,20 +24,27 @@ async def root():
 # ------------------------ PERSON/ FUNCTIONS ------------------------
 def generate_PID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT p_id FROM people order by p_id asc LIMIT 1")
+    cursor.execute(f"SELECT p_id FROM people order by p_id desc LIMIT 1")
     last_pid = int(cursor.fetchall()[0][0][1:])
-    new_pid = 'P' + str(last_pid - 1)
+    new_pid = 'P' + str(last_pid + 5)
     cursor.close()
     return new_pid
 
 def generate_PetID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT pet_id FROM pets order by p_id asc LIMIT 1")
+    cursor.execute(f"SELECT pet_id FROM pets order by pet_id desc LIMIT 1")
     last_id = int(cursor.fetchall()[0][0][2:])
-    new_id = 'PE' + str(last_id - 1)
+    new_id = 'PE' + str(last_id + 1)
     cursor.close()
     return new_id
 
+def generate_ApptID() :
+    cursor = db.cursor()
+    cursor.execute(f"SELECT appt_i FROM pets order by appt_id desc LIMIT 1")
+    last_id = int(cursor.fetchall()[0][0][1:])
+    new_id = 'A' + str(last_id + 1)
+    cursor.close()
+    return new_id
 
 # To render user registration form
 @app.get("/user/add", response_class=HTMLResponse)
@@ -79,7 +86,7 @@ async def user_login(request : Request) :
     res = cursor.fetchall()
     cursor.close()
 
-    if res[0][0] == pwd :
+    if res and res[0][0] == pwd :
         # Default redirect makes POST request, changing status code match GET
         return RedirectResponse(url=f'/user/homepage/{p_id}', status_code=302)
     else :
@@ -98,40 +105,113 @@ async def user_homepage(request: Request, p_id:str):
 
 # To render pet registration form for a user
 @app.get("/pet/add", response_class=HTMLResponse)
-async def render_pet_add(request: Request, p_id, endpoint):
-    return templates.TemplateResponse("petForm.html", {"request": request, "p_id" : p_id, "endpoint" : endpoint})
+async def render_pet_add(request: Request, p_id):
+    return templates.TemplateResponse("petForm.html", {"request": request, "p_id" : p_id})
 
 # To actually add pet
 @app.post("/pet/add")
 async def pet_add(request : Request) :
     pet_id = generate_PetID()
     form_data = await request.form()
-    data = (pet_id,) + tuple((value for key, value in form_data.items()))
+    form_data = tuple(value for key, value in form_data.items())
+    pets_data, vac_data = (pet_id,) + form_data[0 : 6], (pet_id,) + form_data[6:]
 
     cursor = db.cursor()
-    sql = 'INSERT INTO pets (pet_id, p_id, pet_name, pet_species, pet_breed, pet_gender, pet_dob) VALUES (%s, %s, %s, %s, %s, %s, %s)'
-    cursor.execute(sql, data)
+    pets_sql = 'INSERT INTO pets (pet_id, p_id, pet_name, pet_species, pet_breed, pet_gender, pet_dob) VALUES (%s, %s, %s, %s, %s, %s, %s)'
+    cursor.execute(pets_sql, pets_data)
     db.commit()
+
+    vacs_sql = 'INSERT INTO vaccinations VALUES (%s, %s, %s)'
+    cursor.execute(vacs_sql, vac_data)
+    db.commit()
+
     cursor.close()
     return {"Message" : "Successfully added pet!"}
 
 # To render all details of a user's pet
 @app.get("/pet/view", response_class=HTMLResponse)
 async def render_pet_add(request: Request, p_id):
-    # Getting all pets of given user
+    
+    # Getting details of all pets of a user from PETS table
     cursor = db.cursor()
     sql = "SELECT * FROM pets WHERE p_id = %s"
     cursor.execute(sql, (p_id,))
     res = cursor.fetchall()
+
     return templates.TemplateResponse("petView.html", {"request": request,"res" : res})
 
+# To view vaccination history of a pet (from user or vet side)
+@app.get("/pet/vacc", response_class=HTMLResponse)
+async def render_pet_vacc(request : Request, pet_id) :
+    cursor = db.cursor()
+    sql = "SELECT v.pet_id, p.pet_name, v.vac_name, v.vac_date\
+           FROM vaccinations v JOIN pets p on v.pet_id = p.pet_id\
+           WHERE v.pet_id = %s"
+    
+    cursor.execute(sql, (pet_id,))
+    res = cursor.fetchall()
+
+    return templates.TemplateResponse("petVaccs.html", {"request": request,"res" : res})
+
 # To delete a PET from user side
-@app.get("/pet/delete")
-async def pet_edit(request : Request, p_id, pet_id) :
+@app.post("/pet/delete")
+async def pet_delete(request : Request) :
+    form_data = await request.form()
+    data = tuple((value for key, value in form_data.items()))
+    
     cursor = db.cursor()
     sql = 'DELETE FROM pets WHERE p_id = %s and pet_id = %s'
-    cursor.execute(sql, (p_id, pet_id))
+    cursor.execute(sql, data)
     db.commit()
     cursor.close()
     return {"Message" : "Successfully DELETED pet!"}
 
+# To render user edit form
+@app.get("/user/edit")
+async def render_user_edit(request : Request, p_id) :
+    return templates.TemplateResponse("userEdit.html", {"request": request, "p_id" : p_id})
+
+# To actually edit the profile
+@app.post("/user/edit")
+async def user_edit(request : Request) :
+    form_data = await request.form()
+    form_data = tuple(value for key, value in form_data.items())
+    p_id, data = form_data[0], form_data[1 : ]
+    data += (p_id,)
+
+    cursor = db.cursor()
+    sql = "UPDATE people SET \
+        p_firstName = %s, p_lastName = %s, p_phone = %s, \
+        p_locality = %s, p_street = %s, p_houseNum = %s, p_password = %s\
+        WHERE p_id = %s"
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+
+    return {"Message" : "Successfully updated user profile!"}
+
+@app.post("/user/delete")
+async def user_delete(request : Request) :
+    p_id = (await request.form())["p_id"]
+    cursor = db.cursor()
+    sql = f"DELETE FROM people WHERE p_id = %s"
+    cursor.execute(sql, (p_id,))
+    db.commit()
+    cursor.close()
+    return {"Message" : "Successfully deleted profile!"}
+
+
+# SHOULD DISPLAY AVAILABLE DOCTORS IN CLINICS NEARBY!!!
+@app.get("/user/book")
+async def render_user_book(request : Request, p_id, pet_id) :
+    return templates.TemplateResponse("userBook.html", {"request": request, "p_id" : p_id, "pet_id" : pet_id})
+
+# TO BE DONE
+# @app.post("/user/book")
+# async def user_book(request : Request) :
+#     form_data = await request.form()
+#     form_data = tuple(value for key, value in form_data.items())
+#     appt_id = generate_ApptID()
+#     data = (appt_id,) + form_data
+
+#     sql = 'INSERT INTO appointments '
