@@ -113,7 +113,9 @@ async def pet_add(request : Request) :
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
-    return {"Message" : "Successfully added pet!"}
+
+    # Redirect to the vaccination form with the newly generated pet_id
+    return RedirectResponse(url=f"/vaccination/add?pet_id={pet_id}&endpoint=/vaccination/add", status_code=302)
 
 # To render all details of a user's pet
 @app.get("/pet/view", response_class=HTMLResponse)
@@ -160,12 +162,12 @@ async def vet_add(request : Request):
     data = tuple(data)
 
     cursor = db.cursor()
-    sql = "INSERT INTO vets VALUE (%s, %s, %s, %s, %s, %s)"
+    sql = "INSERT INTO vets VALUE (%s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
 
-    # This p_id will be used for login later
+    # This v_id will be used for login later
     return {"Message" : "Successfully added vet!", "Vet ID" : v_id}
 
 # To render vet login form
@@ -177,10 +179,11 @@ async def render_vet_login(request: Request):
 @app.post("/vet/login", response_class=RedirectResponse)
 async def vet_login(request : Request) :
     form_data = await request.form()
+    print(form_data)
     v_id, pwd = (value for key, value in form_data.items())
 
     cursor = db.cursor()
-    sql = "SELECT v_password FROM vets WHERE v_id = %s"
+    sql = "SELECT password FROM vets WHERE vet_id = %s"
     cursor.execute(sql, (v_id,))
     res = cursor.fetchall()
     cursor.close()
@@ -195,34 +198,34 @@ async def vet_login(request : Request) :
 async def vet_homepage(request: Request, v_id: str):
     cursor = db.cursor()
     # Retrieve vet details
-    cursor.execute("SELECT * FROM vets WHERE v_id = %s", (v_id,))
+    cursor.execute("SELECT * FROM vets WHERE vet_id = %s", (v_id,))
     vet_details = cursor.fetchone()
     
     # Retrieve pets associated with the vet
-    cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,))
-    pets = cursor.fetchall()
+    # cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,)) # need to see how to update the vet id to pets upon booking
+    # pets = cursor.fetchall()
     
     cursor.close()
-    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details, "pets": pets})
+    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details}) #, "pets": pets
 
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
 
 # To render vaccination registration form
 @app.get("/vaccination/add", response_class=HTMLResponse)
-async def render_vac_add(request: Request):
-    return templates.TemplateResponse("vacForm.html", {"request": request})
+async def render_vac_add(request: Request, pet_id: str):
+    return templates.TemplateResponse("vaccinationForm.html", {"request": request, "pet_id" : pet_id})
 
 # To add vaccination to DB
 @app.post("/vaccination/add")
-async def vac_add(request : Request, p_id):
+async def vac_add(request : Request, pet_id: str):
     form_data = await request.form()
     data = list(value for key, value in form_data.items())
-    data.insert(0, p_id)
+    data.insert(0, pet_id)
     data = tuple(data)
 
     cursor = db.cursor()
-    sql = "INSERT INTO vaccinations VALUE (%s, %s)"
+    sql = "INSERT INTO vaccinations VALUE (%s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
@@ -230,3 +233,11 @@ async def vac_add(request : Request, p_id):
     # This p_id will be used for login later
     return {"Message" : "Successfully added vaccination!"}
 
+
+# Clinic details will be added manually. From that, I need to source the admin id and check if the admin id is the same as the vet id.
+# If yes, then the vet can view the clinic details. If not, then the vet cannot view the clinic details.
+# All this should be displayed in the vet homepage itself.
+
+# Also think we need to add the admin id column to the clinics table in the database.
+
+# now I need to start with apppointments. When an appointment is fixed, the vet id should be added to the pets table, so that I can view all the pets having appointmnets for the vet in the vet's homepage.
