@@ -8,7 +8,8 @@ p_lastName varchar(25),
 p_phone BIGINT unique,
 p_locality varchar(25),
 p_street varchar(25),
-p_houseNum int);
+p_houseNum int,
+p_password varchar(25));
 
 create table if not exists vets (
 vet_id varchar(5) primary key,		-- VXXX

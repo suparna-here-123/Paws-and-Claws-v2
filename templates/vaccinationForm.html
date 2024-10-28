@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vaccination Form</title>
+</head>
+<body>
+    <h2>Vaccination details of {{ p_id }}</h2>
+
+    <form action="{{ endpoint }}" method="post">
+        <label for="Vaccine Name">Vaccine Name</label><br>
+        <input type="radio" id="vaccine_name" name="vaccine_name" value="Rabies">
+        <label for="Rabies">Rabies</label><br>
+        <input type="radio" id="vaccine_name" name="vaccine_name" value="Flu">
+        <label for="Flu">Flu</label><br>
+        <input type="radio" id="vaccine_name" name="vaccine_name" value="S3P">
+        <label for="Flu">S3P</label><br>
+            
+        <label for="Date">Date</label>
+        <input type="date" id="date" name="date"><br><br>
+        
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

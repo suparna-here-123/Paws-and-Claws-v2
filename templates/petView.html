@@ -23,7 +23,7 @@
             <p><strong>Breed:</strong> {{ record[5] }}</p>
             <p><strong>Gender:</strong> {{ record[6] }}</p>
             <p><strong>Date of Birth:</strong> {{ record[7] }}</p>
-            <p><strong>Medical Record:</strong> {{ record[8] or "N/A" }}</p>
+            <p><strong>Medical Record:</strong> {{ record[8] or "N/A" }}</p>  <!--Need to see how we can show the vaccination details here -->
             
             <a href="/pet/delete?p_id={{ record[1] }}&pet_id={{ record[0] }}">Delete Pet</a>
         </div>

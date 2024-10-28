@@ -8,7 +8,7 @@ from pydantic import BaseModel
 db = mysql.connector.connect(
     host='localhost',
     user='root',
-    password='SuparnaSQL',
+    password='30-nov-03',
     database='susu'
 )
 
@@ -134,4 +134,99 @@ async def pet_edit(request : Request, p_id, pet_id) :
     db.commit()
     cursor.close()
     return {"Message" : "Successfully DELETED pet!"}
+
+# -------------------------- VET FUNCTIONS --------------------------
+
+def generate_VID() :
+    cursor = db.cursor()
+    cursor.execute(f"SELECT v_id FROM vets order by v_id asc LIMIT 1")
+    last_vid = int(cursor.fetchall()[0][0][1:])
+    new_vid = 'V' + str(last_vid - 1)
+    cursor.close()
+    return new_vid
+
+# To render vet registration form
+@app.get("/vet/add", response_class=HTMLResponse)
+async def render_vet_add(request: Request):
+    return templates.TemplateResponse("vetForm.html", {"request": request})
+
+# To add vet to DB
+@app.post("/vet/add")
+async def vet_add(request : Request):
+    form_data = await request.form()
+    v_id = generate_VID()
+    data = list(value for key, value in form_data.items())
+    data.insert(0, v_id)
+    data = tuple(data)
+
+    cursor = db.cursor()
+    sql = "INSERT INTO vets VALUE (%s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+
+    # This p_id will be used for login later
+    return {"Message" : "Successfully added vet!", "Vet ID" : v_id}
+
+# To render vet login form
+@app.get("/vet/login", response_class=HTMLResponse)
+async def render_vet_login(request: Request):
+    return templates.TemplateResponse("vetLogin.html", {"request": request})
+
+# To verify vet from DB
+@app.post("/vet/login", response_class=RedirectResponse)
+async def vet_login(request : Request) :
+    form_data = await request.form()
+    v_id, pwd = (value for key, value in form_data.items())
+
+    cursor = db.cursor()
+    sql = "SELECT v_password FROM vets WHERE v_id = %s"
+    cursor.execute(sql, (v_id,))
+    res = cursor.fetchall()
+    cursor.close()
+
+    if res[0][0] == pwd :
+        # Default redirect makes POST request, changing status code match GET
+        return RedirectResponse(url=f'/vet/homepage/{v_id}', status_code=302)
+    else :
+        return templates.TemplateResponse("invalid.html", context={"request" : request})
+    
+@app.get("/vet/homepage/{v_id}", response_class=HTMLResponse)
+async def vet_homepage(request: Request, v_id: str):
+    cursor = db.cursor()
+    # Retrieve vet details
+    cursor.execute("SELECT * FROM vets WHERE v_id = %s", (v_id,))
+    vet_details = cursor.fetchone()
+    
+    # Retrieve pets associated with the vet
+    cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,))
+    pets = cursor.fetchall()
+    
+    cursor.close()
+    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details, "pets": pets})
+
+
+# -------------------------- VACCINATION FUNCTIONS --------------------------
+
+# To render vaccination registration form
+@app.get("/vaccination/add", response_class=HTMLResponse)
+async def render_vac_add(request: Request):
+    return templates.TemplateResponse("vacForm.html", {"request": request})
+
+# To add vaccination to DB
+@app.post("/vaccination/add")
+async def vac_add(request : Request, p_id):
+    form_data = await request.form()
+    data = list(value for key, value in form_data.items())
+    data.insert(0, p_id)
+    data = tuple(data)
+
+    cursor = db.cursor()
+    sql = "INSERT INTO vaccinations VALUE (%s, %s)"
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+
+    # This p_id will be used for login later
+    return {"Message" : "Successfully added vaccination!"}
 
