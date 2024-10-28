@@ -40,7 +40,7 @@ def generate_PetID() :
 
 def generate_ApptID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT appt_i FROM pets order by appt_id desc LIMIT 1")
+    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id desc LIMIT 1")
     last_id = int(cursor.fetchall()[0][0][1:])
     new_id = 'A' + str(last_id + 1)
     cursor.close()
@@ -202,16 +202,41 @@ async def user_delete(request : Request) :
 
 
 # SHOULD DISPLAY AVAILABLE DOCTORS IN CLINICS NEARBY!!!
-@app.get("/user/book")
-async def render_user_book(request : Request, p_id, pet_id) :
-    return templates.TemplateResponse("userBook.html", {"request": request, "p_id" : p_id, "pet_id" : pet_id})
+@app.get("/user/clinics")
+async def render_user_clinics(request : Request, p_id, pet_id) :
+    # Show all clinics in this locality
+    sql = "SELECT * FROM clinics WHERE c_locality = \
+           (SELECT p_locality FROM people WHERE p_id = %s)\
+            ORDER BY c_opensAt"
+    
+    cursor = db.cursor()
+    cursor.execute(sql, (p_id,))
+    clinics = cursor.fetchall()
+        
+    return templates.TemplateResponse("userClinics.html", {"request": request, "p_id" : p_id, "pet_id" : pet_id, "clinics" : clinics})
 
-# TO BE DONE
-# @app.post("/user/book")
-# async def user_book(request : Request) :
-#     form_data = await request.form()
-#     form_data = tuple(value for key, value in form_data.items())
-#     appt_id = generate_ApptID()
-#     data = (appt_id,) + form_data
+@app.get("/user/vets")
+async def render_user_vets(request : Request, c_id, pet_id) :
+    sql = "SELECT * FROM vets v JOIN\
+           (SELECT e.vet_id FROM employments e WHERE e.c_id = %s) as alias\
+           ON v.vet_id = alias.vet_id"
+    
+    cursor = db.cursor()
+    cursor.execute(sql, (c_id,))
+    clinic_vets = cursor.fetchall()
+    
+    return templates.TemplateResponse("vetsView.html", {"request": request, "pet_id" : pet_id, "c_id" : c_id, "clinic_vets" : clinic_vets})
 
-#     sql = 'INSERT INTO appointments '
+@app.post("/user/book")
+async def user_book(request : Request, c_id, vet_id, pet_id) :
+    form_data = await request.form()
+    form_data = tuple(value for key, value in form_data.items())
+    appt_id = generate_ApptID()
+
+    data = (appt_id,) + (c_id, vet_id, pet_id) + form_data
+    sql = 'INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s)'
+    cursor = db.cursor()
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+    return {"Message" : "Successfully booked appointment"}
