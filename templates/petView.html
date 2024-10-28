@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Details of a User</title>
+    <style>
+        .pet-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Pet Details</h2>
+    {% for record in res %}
+        <div class="pet-block">
+            <p><strong>ID:</strong> {{ record[0] }}</p>
+            <p><strong>Owner ID:</strong> {{ record[1] }}</p>
+            <p><strong>Owner Name:</strong> {{ p_id }}</p>
+            <p><strong>Pet Name:</strong> {{ record[3] }}</p>
+            <p><strong>Type:</strong> {{ record[4] }}</p>
+            <p><strong>Breed:</strong> {{ record[5] }}</p>
+            <p><strong>Gender:</strong> {{ record[6] }}</p>
+            <p><strong>Date of Birth:</strong> {{ record[7] }}</p>
+            <p><strong>Medical Record:</strong> {{ record[8] or "N/A" }}</p>
+            
+            <a href="/pet/delete?p_id={{ record[1] }}&pet_id={{ record[0] }}">Delete Pet</a>
+        </div>
+    {% endfor %}
+</body>
+</html>

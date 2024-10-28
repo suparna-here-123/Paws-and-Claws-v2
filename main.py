@@ -98,10 +98,10 @@ async def user_homepage(request: Request, p_id:str):
 
 # To render pet registration form for a user
 @app.get("/pet/add", response_class=HTMLResponse)
-async def render_pet_add(request: Request, p_id):
-    return templates.TemplateResponse("petForm.html", {"request": request, "p_id" : p_id})
+async def render_pet_add(request: Request, p_id, endpoint):
+    return templates.TemplateResponse("petForm.html", {"request": request, "p_id" : p_id, "endpoint" : endpoint})
 
-# To actually add
+# To actually add pet
 @app.post("/pet/add")
 async def pet_add(request : Request) :
     pet_id = generate_PetID()
@@ -114,3 +114,24 @@ async def pet_add(request : Request) :
     db.commit()
     cursor.close()
     return {"Message" : "Successfully added pet!"}
+
+# To render all details of a user's pet
+@app.get("/pet/view", response_class=HTMLResponse)
+async def render_pet_add(request: Request, p_id):
+    # Getting all pets of given user
+    cursor = db.cursor()
+    sql = "SELECT * FROM pets WHERE p_id = %s"
+    cursor.execute(sql, (p_id,))
+    res = cursor.fetchall()
+    return templates.TemplateResponse("petView.html", {"request": request,"res" : res})
+
+# To delete a PET from user side
+@app.get("/pet/delete")
+async def pet_edit(request : Request, p_id, pet_id) :
+    cursor = db.cursor()
+    sql = 'DELETE FROM pets WHERE p_id = %s and pet_id = %s'
+    cursor.execute(sql, (p_id, pet_id))
+    db.commit()
+    cursor.close()
+    return {"Message" : "Successfully DELETED pet!"}
+

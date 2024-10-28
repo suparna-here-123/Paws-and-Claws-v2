@@ -6,7 +6,8 @@
 </head>
 <body>
     <h2>Pet of {{ p_id }}</h2>
-    <form action="/pet/add" method="post">
+
+    <form action="{{ endpoint }}" method="post">
         <label for="Owner">Owner</label>
         <input type="text" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
 
