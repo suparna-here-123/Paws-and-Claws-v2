@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pet Vaccination History</title>
+    <style>
+        .pet-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Vaccination History of {{ res[1] }}</h2>
+    {% for record in res %}
+        <div class="pet-block">
+            <p><strong>Vaccine Name:</strong> {{ record[2] }}</p>
+            <p><strong>Vaccine Date:</strong> {{ record[3] }}</p>            
+        </div>
+    {% endfor %}
+</body>
+</html>

@@ -2,14 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Home Page</title>
+    <title>Vet Home Page</title>
 </head>
 <body>
-    <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
+    <h2>Welcome, {{ details[1] }} {{ details[2] }}</h2>
 
-    <a href="/appointment/view?vet_id={{res[0]}}">View Appointments</a>
-    <a href="/clinic/view?admin_id={{res[0]}}">View Clinic Details</a>
+    <a href="/appointment/view?vet_id={{ details[0] }}">View Appointments</a>
     
-    <!-- TODO: View appointments, view clinic details if admin -->
+    {% if details[0] == admin_id %}
+    <a href="/clinic/view?admin_id={{ details[0] }}">View Clinic Details</a>
+    {% endif %}
+    
+    <a href="/pet/view?id={{details[0]}}">View Pets</a>
+    {% if pets and pets|length > 0 %}
+        <a href="/appointment/add?pet_id={{ pets[0][0] }}&vet_id={{ details[0] }}">Add an Appointment</a>
+    {% else %}
+        <p>No pets registered yet.</p>
+    {% endif %}
+
 </body>
 </html>
+

@@ -6,18 +6,24 @@
 </head>
 <body>
     <h1>Add Appointment</h1>
-    <form method="POST" action="/appointment/add">
+    <form method="POST" action="/appointment/add?pet_id={{ pet_id }}&vet_id={{ vet_id }}">
         <!-- Clinic ID Dropdown -->
         <label for="c_id">Select Clinic:</label>
         <select name="c_id" id="c_id" required>
-            {% for clinic_id in clinic_ids %}
-                <option value="{{ clinic_id }}">{{ clinic_id }}</option>
+            {% for clinic in clinics_info %}
+                <option value="{{ clinic.c_id }}" 
+                        data-opening="{{ clinic.opening_time }}" 
+                        data-closing="{{ clinic.closing_time }}">
+                    {{ clinic.c_id }}
+                </option>
             {% endfor %}
         </select><br><br>
 
-        <!-- Appointment Time Input -->
+        <!-- Appointment Time Dropdown -->
         <label for="appt_time">Appointment Time:</label>
-        <input type="time" name="appt_time" id="appt_time" required><br><br>
+        <select name="appt_time" id="appt_time" required>
+            <!-- Options will be populated dynamically -->
+        </select><br><br>
 
         <!-- Appointment Reason Dropdown -->
         <label for="appt_reason">Appointment Reason:</label>
@@ -28,9 +34,60 @@
         </select><br><br>
 
         <label for="appt_date">Date of appointment</label>
-        <input type="date" id="appt_date" name="appt_date"><br><br>
+        <input type="date" id="appt_date" name="appt_date" required><br><br>
 
         <button type="submit">Submit Appointment</button>
     </form>
+
+    <script>
+        const clinicDropdown = document.getElementById("c_id");
+        const apptTimeDropdown = document.getElementById("appt_time");
+
+        // Function to populate time options within clinic hours
+        function populateTimeOptions(openingTime, closingTime) {
+            // Clear existing options
+            apptTimeDropdown.innerHTML = '';
+
+            // Parse opening and closing times
+            const [openHour, openMinute] = openingTime.split(":").map(Number);
+            const [closeHour, closeMinute] = closingTime.split(":").map(Number);
+
+            // Generate time options every 15 minutes within the open-close interval
+            let currentHour = openHour;
+            let currentMinute = openMinute;
+
+            while (currentHour < closeHour || (currentHour === closeHour && currentMinute <= closeMinute)) {
+                const hour = String(currentHour).padStart(2, '0');
+                const minute = String(currentMinute).padStart(2, '0');
+                const timeOption = `${hour}:${minute}`;
+
+                const optionElement = document.createElement("option");
+                optionElement.value = timeOption;
+                optionElement.textContent = timeOption;
+                apptTimeDropdown.appendChild(optionElement);
+
+                // Increment by 30 minutes
+                currentMinute += 30;
+                if (currentMinute >= 60) {
+                    currentMinute = 0;
+                    currentHour++;
+                }
+            }
+        }
+
+        // Update time options when the clinic selection changes
+        clinicDropdown.addEventListener("change", function() {
+            const selectedClinic = clinicDropdown.selectedOptions[0];
+            const openingTime = selectedClinic.getAttribute("data-opening");
+            const closingTime = selectedClinic.getAttribute("data-closing");
+
+            if (openingTime && closingTime) {
+                populateTimeOptions(openingTime, closingTime);
+            }
+        });
+
+        // Trigger the change event on page load to set initial options
+        clinicDropdown.dispatchEvent(new Event("change"));
+    </script>
 </body>
 </html>

@@ -23,9 +23,23 @@
             <p><strong>Breed:</strong> {{ record[5] }}</p>
             <p><strong>Gender:</strong> {{ record[6] }}</p>
             <p><strong>Date of Birth:</strong> {{ record[7] }}</p>
-            <p><strong>Medical Record:</strong> {{ record[8] or "N/A" }}</p>  <!--Need to see how we can show the vaccination details here -->
+
             
-            <a href="/pet/delete?p_id={{ record[1] }}&pet_id={{ record[0] }}">Delete Pet</a>
+            <a href="/pet/vacc?pet_id={{ record[0]}}">
+                <button style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Vaccination History
+                </button>
+            </a>
+
+            <!-- Wrapping button inside form coz that's the only way to send post request-->
+            <form action="/pet/delete" method="POST" style="display: inline;">
+                <input type="hidden" name="p_id" value="{{ record[1] }}">
+                <input type="hidden" name="pet_id" value="{{ record[0] }}">
+                <button type="submit" style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Delete Pet
+                </button>
+            </form>
+
         </div>
     {% endfor %}
 </body>

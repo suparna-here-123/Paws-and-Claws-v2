@@ -119,13 +119,27 @@ async def pet_add(request : Request) :
 
 # To render all details of a user's pet
 @app.get("/pet/view", response_class=HTMLResponse)
-async def render_pet_add(request: Request, p_id):
-    # Getting all pets of given user
+async def render_pet_add(request: Request, id: str):
+    # Getting all pets where the given id matches either p_id or vet_id
     cursor = db.cursor()
-    sql = "SELECT * FROM pets WHERE p_id = %s"
-    cursor.execute(sql, (p_id,))
+    sql = "SELECT * FROM pets WHERE p_id = %s OR vet_id = %s"
+    cursor.execute(sql, (id, id))
     res = cursor.fetchall()
-    return templates.TemplateResponse("petView.html", {"request": request,"res" : res})
+    cursor.close()
+    return templates.TemplateResponse("petView.html", {"request": request, "res": res})
+
+# To view vaccination history of a pet (from user or vet side)
+@app.get("/pet/vacc", response_class=HTMLResponse)
+async def render_pet_vacc(request : Request, pet_id) :
+    cursor = db.cursor()
+    sql = "SELECT v.pet_id, p.pet_name, v.vac_name, v.vac_date\
+           FROM vaccinations v JOIN pets p on v.pet_id = p.pet_id\
+           WHERE v.pet_id = %s"
+    
+    cursor.execute(sql, (pet_id,))
+    res = cursor.fetchall()
+
+    return templates.TemplateResponse("petVaccs.html", {"request": request,"res" : res})
 
 # To delete a PET from user side
 @app.get("/pet/delete")
@@ -200,13 +214,18 @@ async def vet_homepage(request: Request, v_id: str):
     # Retrieve vet details
     cursor.execute("SELECT * FROM vets WHERE vet_id = %s", (v_id,))
     vet_details = cursor.fetchone()
-    
-    # Retrieve pets associated with the vet
-    cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,)) # need to see how to update the vet id to pets upon booking
+
+    cursor.execute("SELECT * FROM pets WHERE vet_id = %s", (v_id,))
     pets = cursor.fetchall()
+
+    # Fetch admin_id if the vet is also an admin
+    sql_admin = "SELECT admin_id FROM clinics WHERE admin_id = %s"
+    cursor.execute(sql_admin, (v_id,))
+    admin_record = cursor.fetchone()
+    admin_id = admin_record[0] if admin_record else None
     
     cursor.close()
-    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details, "pets": pets}) #, "pets": pets
+    return templates.TemplateResponse("vetHomePage.html", {"request": request, "details": vet_details, "pets": pets, "admin_id": admin_id})
 
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
@@ -257,9 +276,15 @@ def generate_APPTID() :
 # To render appointment registration form
 @app.get("/appointment/add", response_class=HTMLResponse)
 async def render_appt_add(request: Request, pet_id: str, vet_id: str):
-    # Create a cursor and perform the query to get all clinic IDs for the given vet_id
+
     cursor = db.cursor()
-    sql = "SELECT c_id FROM employments WHERE vet_id = %s"
+    # Modify query to fetch clinic IDs along with their opening and closing times
+    sql = """
+    SELECT employments.c_id, clinics.c_opensAt, clinics.c_closesAt
+    FROM employments 
+    JOIN clinics ON employments.c_id = clinics.c_id 
+    WHERE vet_id = %s
+    """
     cursor.execute(sql, (vet_id,))
     results = cursor.fetchall()  # Fetch all results to handle multiple clinics
     cursor.close()
@@ -268,32 +293,48 @@ async def render_appt_add(request: Request, pet_id: str, vet_id: str):
     if not results:
         raise HTTPException(status_code=404, detail="No clinics found for this vet.")
 
-    # Extract clinic IDs into a list
-    clinic_ids = [row[0] for row in results]
+    # Structure the data
+    clinics_info = [
+        {
+            "c_id": row[0],
+            "opening_time": row[1],
+            "closing_time": row[2]
+        } for row in results
+    ]
 
-    # Render the template with clinic IDs for selection
+    # Render the template with clinic info for selection
     return templates.TemplateResponse("appointmentForm.html", {
         "request": request,
         "pet_id": pet_id,
         "vet_id": vet_id,
-        "clinic_ids": clinic_ids  # Pass list of clinic IDs to the template
+        "clinics_info": clinics_info  # Pass list of clinics info to the template
     })
 
 # To add appointment to DB
 @app.post("/appointment/add")
 async def appt_add(request: Request, pet_id: str, vet_id: str):
-    # Get form data submitted by the vet, which includes clinic_id and other appointment details
+    # Get form data submitted by the vet, which includes clinic_id, appointment time, reason, and date
     form_data = await request.form()
     appt_id = generate_APPTID()
-    data = list(value for key, value in form_data.items())
-    data.insert(0, appt_id)
-    updated_data = (data[0], data[1], vet_id, pet_id, *data[2:])
-    data = tuple(updated_data)
+    c_id = form_data["c_id"]
+    appt_time = form_data["appt_time"]
+    appt_reason = form_data["appt_reason"]
+    appt_date = form_data["appt_date"]
+    
+    # Prepare data tuple for insertion in the expected order of columns
+    data = (appt_id, c_id, vet_id, pet_id, appt_time, appt_reason, appt_date)
 
     cursor = db.cursor()
-    sql = "INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s, %s)"
-    sql = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
-    cursor.execute(sql, data)
+    
+    # Insert appointment data into the appointments table
+    sql_insert = "INSERT INTO appointments VALUES (%s, %s, %s, %s, %s, %s, %s)"
+    cursor.execute(sql_insert, data)
+    
+    # Update the vet_id in the pets table
+    sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
+    cursor.execute(sql_update, (vet_id, pet_id))
+
+    # Commit the transaction and close the cursor
     db.commit()
     cursor.close()
 
