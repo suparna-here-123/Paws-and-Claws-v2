@@ -1,3 +1,2 @@
--> Confirmation of appointment not showing time and reason
 -> Should display appointment timings according to the clinic timings
 -> Users view upcoming appointments

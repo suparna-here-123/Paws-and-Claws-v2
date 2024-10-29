@@ -217,15 +217,40 @@ async def render_user_clinics(request : Request, p_id, pet_id) :
 
 @app.get("/user/vets")
 async def render_user_vets(request : Request, c_id, pet_id) :
-    sql = "SELECT * FROM vets v JOIN\
+    sql_1 = "SELECT * FROM vets v JOIN\
            (SELECT e.vet_id FROM employments e WHERE e.c_id = %s) as alias\
            ON v.vet_id = alias.vet_id"
     
     cursor = db.cursor()
-    cursor.execute(sql, (c_id,))
+    cursor.execute(sql_1, (c_id,))
     clinic_vets = cursor.fetchall()
+
+    # Fetching timings of the clinic
+    sql_2 = "SELECT c_opensAt, c_closesAt FROM clinics WHERE c_id = %s"
+    cursor.execute(sql_2, (c_id,))
+    timings = cursor.fetchall()             # time is return in datetime.timedelta(seconds = ,) format
+    cursor.close()
     
-    return templates.TemplateResponse("vetsView.html", {"request": request, "pet_id" : pet_id, "c_id" : c_id, "clinic_vets" : clinic_vets})
+    ft = []
+    for open_close_tuple in timings:
+        # Extract both opening and closing times
+        opens_at, closes_at = open_close_tuple
+        
+        # Convert opening time to HH:MM
+        open_hours, open_remainder = divmod(opens_at.seconds, 3600)
+        open_minutes = open_remainder // 60
+        formatted_open_time = f"{open_hours:02}:{open_minutes:02}"
+        
+        # Convert closing time to HH:MM
+        close_hours, close_remainder = divmod(closes_at.seconds, 3600)
+        close_minutes = close_remainder // 60
+        formatted_close_time = f"{close_hours:02}:{close_minutes:02}"
+        
+        # Append the pair of formatted times
+        ft.append((formatted_open_time, formatted_close_time))
+
+
+    return templates.TemplateResponse("vetsView.html", {"request": request, "pet_id" : pet_id, "c_id" : c_id, "ft" : ft, "clinic_vets" : clinic_vets})
 
 @app.post("/user/book")
 async def user_book(request : Request, c_id, vet_id, pet_id) :
@@ -239,4 +264,42 @@ async def user_book(request : Request, c_id, vet_id, pet_id) :
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
-    return {"Message" : "Successfully booked appointment"}
+
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully booked appointment!"})
+
+def convert(datetime_ele) :
+    # Convert closing time to HH:MM
+    hours, rem = divmod(datetime_ele.seconds, 3600)
+    mins = rem // 60
+    formatted = f"{hours:02}:{mins:02}"
+    return formatted
+
+@app.get("/user/upcoming")
+async def user_upcoming(request : Request, p_id) :
+    cursor = db.cursor()
+
+    # Step 1 : Find all pets of this user
+    sql_1 = "(SELECT pet_id FROM pets WHERE p_id = %s) AS alias_1"
+
+    # Step 2 : Find all appointments with these pet IDs
+    sql_2 = "SELECT appt_id, c_id, vet_id, a.pet_id, appt_time, appt_reason FROM appointments a JOIN " + sql_1 + " ON a.pet_id = alias_1.pet_id"
+    cursor.execute(sql_2, (p_id,))
+    appts = cursor.fetchall()
+    f_appts = []
+    for appt in appts :
+        new = list(appt)
+        new[4] = convert(new[4])
+        f_appts.append(new)
+
+    return templates.TemplateResponse("userAppts.html", {"request": request, \
+                                                        "appts" : f_appts,\
+                                                        "p_id" : p_id})
+
+@app.get("/user/cancel")
+async def user_cancel(request : Request, appt_id) :
+    cursor = db.cursor()
+    sql = "DELETE FROM appointments WHERE appt_id = %s"
+    cursor.execute(sql, (appt_id,))
+    db.commit()
+    cursor.close()
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Cancelled Appointment"})

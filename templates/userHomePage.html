@@ -25,6 +25,12 @@
         </button>
     </a>
 
+    <a href="/user/upcoming?p_id={{ res[0] }}">
+        <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+           Upcoming Appointments
+        </button>
+    </a>
+
     <!-- Wrapping button inside form coz that's the only way to send post request-->
     <form action="/user/delete" method="POST" style="display: inline;">
         <input type="hidden" name="p_id" value="{{ res[0] }}">

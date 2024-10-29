@@ -24,35 +24,27 @@
         
             <form id='apptForm' action="/user/book?c_id={{c_id}}&vet_id={{vet[0]}}&pet_id={{pet_id}}" method="POST" style="display: inline;">
 
-                <label for="Appointment Timing">Appointment Timing</label><br>
-                <input type="time" id="appt_time" name="appt_time" value="Rabies">
+                <label for="appt_time">Time of Appointment</label><br>
+                <input type="time" id="appt_time" name="appt_time" min="{{ft[0]}}" max="{{ft[1]}}" onchange="validateTime()">
+                <!-- <p>{{ft[0]}} {{ft[1]}}</p>
+                
+                <script>
+                    function validateTime() {
+                        const input = document.getElementById('appt_time');
+                        const minTime = input.min
+                        const maxTime = input.max
+                    }
+                </script> -->
 
                 <label for="Reason for Appointment">Reason for Appointment</label><br>
                 <input type="radio" id="appt_reason" name="appt_reason" value="Emergency">
                 <label for="Emergency">Emergency</label><br>
-                <input type="radio" id="appt_reason" name="appt_reason" value="Vaccination">
-                <label for="Vaccination">Vaccination</label><br>
                 <input type="radio" id="appt_reason" name="appt_reason" value="Routine">
                 <label for="Routine">Routine</label><br>
-
-                <button type="button" onclick="confirmAppt()" style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Confirm Appointment
-                </button>
-
-                <script>
-                    function confirmAppt() {
-                        // Gather appointment details
-                        const reason = document.getElementById('appt_reason').value;
-                        const time = document.getElementById('appt_time').value;
-                        
-                        // Display confirmation dialog
-                        const confirmationMessage = `Please confirm the appointment details: \nVet : {{vet[0]}} \nFor Pet : {{pet_id}} \nAt Clinic : {{c_id}} \nAt Time : ${time} \nFor : ${reason} `;
-                        if (confirm(confirmationMessage)) {
-                            // If user confirms, submit the form
-                            document.getElementById('apptForm').submit();
-                        }
-                    }
-                </script>
+                <input type="radio" id="appt_reason" name="appt_reason" value="Vaccination">
+                <label for="Vaccination">Vaccination</label><br>
+                
+                <button type="submit">Book Appointment</button>
             </form>
 
 
