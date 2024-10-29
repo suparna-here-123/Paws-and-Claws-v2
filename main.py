@@ -238,6 +238,7 @@ async def vac_add(request : Request, pet_id: str):
 # If yes, then the vet can view the clinic details. If not, then the vet cannot view the clinic details.
 # All this should be displayed in the vet homepage itself.
 
-# Also think we need to add the admin id column to the clinics table in the database.
+# Also I think we need to add the admin id column to the clinics table in the database.
 
-# now I need to start with apppointments. When an appointment is fixed, the vet id should be added to the pets table, so that I can view all the pets having appointmnets for the vet in the vet's homepage.
+# now I need to start with apppointments. When an appointment is fixed, the vet id should be added to the pets table, so that I can view all the pets having appointments for the vet in the vet's homepage.
+# In the vet's homepage, the vet should be able to see all the upcoming pets and their details, their vaccination history, the option to update their vaccination history, the option to book a new appointment, view clinic details if admin, change the time of existing appointments, and delete appointments.
