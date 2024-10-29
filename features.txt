@@ -1,2 +1,1 @@
 -> Should display appointment timings according to the clinic timings
--> Users view upcoming appointments

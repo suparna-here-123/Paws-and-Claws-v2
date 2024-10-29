@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Pet Registration Form</title>
 </head>
@@ -8,40 +9,35 @@
     <h2>Pet of {{ p_id }}</h2>
 
     <form action="/pet/add" method="post">
-        <label for="Owner">Owner</label>
-        <input type="text" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
+        <input type="hidden" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
 
-        <label for="Pet Name">Pet Name</label>
-        <input type="text" id="pet_name" name="pet_name"><br><br>
+        <input type="text" class="input input-bordered input-info w-full max-w-xs" placeholder="Pet Name" id="pet_name" name="pet_name"><br><br>
 
-        <label for="Pet Species">Pet Species</label>
-        <input type="text" id="pet_species" name="pet_species"><br><br>
+        <input type="text" class="input input-bordered input-info w-full max-w-xs" placeholder="Pet Species" id="pet_species" name="pet_species"><br><br>
 
-        <label for="Pet Breed">Pet Breed</label>
-        <input type="text" id="pet_breed" name="pet_breed"><br><br>
+        <input type="text" class="input input-bordered input-info w-full max-w-xs" placeholder="Pet Breed" id="pet_breed" name="pet_breed"><br><br>
 
-        <label for="Pet Gender">Pet Gender</label><br>
-        <input type="radio" id="pet_gender" name="pet_gender" value="F">
+
+        <input type="radio" id="pet_gender" name="pet_gender" value="F" class="radio radio-info" checked="checked" />
         <label for="Female">Female</label><br>
-        <input type="radio" id="pet_gender" name="pet_gender" value="M">
+        <input type="radio" id="pet_gender" name="pet_gender" value="M" class="radio radio-info" checked="checked" />
         <label for="Male">Male</label><br>
-            
 
-        <label for="Pet DOB">Pet DOB</label>
-        <input type="date" id="pet_dob" name="pet_dob"><br><br>
+        <label for="pet_dob"> Date Of Birth</label>
+        <input type="date" class="input input-bordered input-info w-full max-w-xs" id="pet_dob" name="pet_dob"><br><br>
 
-        <label for="Pet Vaccination History">Pet Vaccination History</label><br>
-        <input type="radio" id="pet_vac" name="pet_vac" value="Rabies">
+
+        <input type="radio" id="pet_vac" name="pet_vac" value="Rabies" class="radio radio-info" checked="checked" />
         <label for="Rabies">Rabies</label><br>
-        <input type="radio" id="pet_vac" name="pet_vac" value="Flu">
+        <input type="radio" id="pet_vac" name="pet_vac" value="Flu" class="radio radio-info" checked="checked">
         <label for="Flu">Flu</label><br>
-        <input type="radio" id="pet_vac" name="pet_vac" value="S3P">
+        <input type="radio" id="pet_vac" name="pet_vac" value="S3P"  class="radio radio-info" checked="checked">
         <label for="S3P">S3P</label><br>
 
-        <label for="Vaccination Date">Vaccination Date</label>
-        <input type="date" id="vac_date" name="vac_date"><br><br>
+        
+        <input class="input input-bordered input-info w-full max-w-xs" type="date" id="vac_date" name="vac_date"><br><br>
 
-        <button type="submit">Submit</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 </body>
 </html>

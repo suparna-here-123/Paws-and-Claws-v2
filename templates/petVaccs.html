@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Pet Vaccination History</title>
     <style>
@@ -12,12 +13,14 @@
     </style>
 </head>
 <body>
-    <h2>Pet Details of {{ res[1] }}</h2>
     {% for res in res %}
-        <div class="pet-block">
-            <p><strong>Vaccine Name</strong> {{ res[2] }}</p>
-            <p><strong>Vaccine Date</strong> {{ res[3] }}</p>            
-        </div>
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <div class="card-body">
+              <h2 class="card-title">{{res[1]}}</h2>
+              <p><strong>Vaccine Name</strong> {{ res[2] }}</p>
+              <p><strong>Vaccine Date</strong> {{ res[3] }}</p>   
+            </div>
+          </div>
     {% endfor %}
 </body>
 </html>

@@ -1,40 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Vets at Clinic {{ c_id }} </title>
-    <style>
-        .vet-block {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
-        }
-    </style>
 </head>
 <body>
     <h2>Vets at Clinic {{ c_id }}</h2>
     {% for vet in clinic_vets %}
-        <div class="vet-block">
-            <p><strong>Vet ID:</strong> {{ vet[0] }}</p>
-            <p><strong>Vet Name:</strong> {{ vet[1] }} {{ vet[2] }}</p>
-            <p><strong>Vet Phone</strong> {{ vet[3] }}</p>
-            <p><strong>Degree</strong> {{ vet[4] }}</p>
-            <p><strong>Years of Experience</strong> {{ vet[5] }}</p>
-            <p><strong>Fee</strong> Rs. {{ vet[6] }}</p>
-        
-            <form id='apptForm' action="/user/book?c_id={{c_id}}&vet_id={{vet[0]}}&pet_id={{pet_id}}" method="POST" style="display: inline;">
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">{{ vet[1] }} {{ vet[2] }}</h2>
+
+                <p><strong>Vet ID:</strong> {{ vet[0] }}</p>
+                <p><strong>Vet Phone</strong> {{ vet[3] }}</p>
+                <p><strong>Degree</strong> {{ vet[4] }}</p>
+                <p><strong>Years of Experience</strong> {{ vet[5] }}</p>
+                <p><strong>Fee</strong> Rs. {{ vet[6] }}</p>
+
+                <form id='apptForm' action="/user/book?c_id={{c_id}}&vet_id={{vet[0]}}&pet_id={{pet_id}}" method="POST" style="display: inline;">
 
                 <label for="appt_time">Time of Appointment</label><br>
                 <input type="time" id="appt_time" name="appt_time" min="{{ft[0]}}" max="{{ft[1]}}" onchange="validateTime()">
-                <!-- <p>{{ft[0]}} {{ft[1]}}</p>
-                
-                <script>
-                    function validateTime() {
-                        const input = document.getElementById('appt_time');
-                        const minTime = input.min
-                        const maxTime = input.max
-                    }
-                </script> -->
 
                 <label for="Reason for Appointment">Reason for Appointment</label><br>
                 <input type="radio" id="appt_reason" name="appt_reason" value="Emergency">
@@ -43,12 +30,14 @@
                 <label for="Routine">Routine</label><br>
                 <input type="radio" id="appt_reason" name="appt_reason" value="Vaccination">
                 <label for="Vaccination">Vaccination</label><br>
-                
-                <button type="submit">Book Appointment</button>
+
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary" type="submit">Confirm Appointment</button>
+                    </div>
+                </div>
             </form>
-
-
         </div>
+
     {% endfor %}
 </body>
 </html>

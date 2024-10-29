@@ -1,47 +1,102 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>User Home Page </title>
+    <style>
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Center cards horizontally */
+            gap: 20px; /* Space between cards */
+        }
+    </style>
 </head>
 <body>
     <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
 
-    <a href="/pet/add?p_id={{ res[0] }}">
-        <button style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Add pet
-        </button>
-    </a>
+    <div class="carousel carousel-end rounded-box">
+        <div class="carousel-item">
+          <div class="card bg-base-100 w-96 shadow-xl">
+            <figure class="px-10 pt-10">
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Add Your Pet!</h2>
+                <p>Some tagline here?</p>
+                <div class="card-actions">
+                    <a href="/pet/add?p_id={{ res[0] }}">
+                        <button class="btn btn-primary">Add pet</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="carousel-item">
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <figure class="px-10 pt-10">
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">View Your Pets!</h2>
+                <div class="card-actions">
+                    <a href="/pet/view?p_id={{ res[0] }}">
+                        <button class="btn btn-primary">View pets</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+        </div>
 
-    <a href="/pet/view?p_id={{ res[0] }}">
-    <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
-        View pets
-    </button>
-    </a>
+        <div class="carousel-item">
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <figure class="px-10 pt-10">
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Edit Your Profile!</h2>
+                <div class="card-actions">
+                    <a href="/user/edit?p_id={{ res[0] }}">
+                        <button class="btn btn-primary">Edit Profile</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="/user/edit?p_id={{ res[0] }}">
-        <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Edit Profile
-        </button>
-    </a>
+    <div class="carousel-item">
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <figure class="px-10 pt-10">
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Your Appointments</h2>
+                <div class="card-actions">
+                    <a href="/user/upcoming?p_id={{ res[0] }}">
+                        <button class="btn btn-primary">Upcoming Appointments</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <a href="/user/upcoming?p_id={{ res[0] }}">
-        <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
-           Upcoming Appointments
-        </button>
-    </a>
-
-    <!-- Wrapping button inside form coz that's the only way to send post request-->
-    <form action="/user/delete" method="POST" style="display: inline;">
-        <input type="hidden" name="p_id" value="{{ res[0] }}">
-        <button type="submit" style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
-            Delete Profile
-        </button>
-    </form>
-
-    
-
-
-    
+        <div class="carousel-item">
+        <div class="card bg-base-100 w-96 shadow-xl">
+            <figure class="px-10 pt-10">
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />
+            </figure>
+            <div class="card-body items-center text-center">
+                <h2 class="card-title">Delete Profile</h2>
+                <div class="card-actions">
+                    <form action="/user/delete" method="POST" style="display: inline;">
+                        <input type="hidden" name="p_id" value="{{ res[0] }}">
+                        <button type="submit" class="btn btn-primary">Delete Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
 </body>
 </html>

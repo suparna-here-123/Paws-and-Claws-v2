@@ -1,5 +1,6 @@
 import mysql.connector
 from fastapi import FastAPI, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -16,10 +17,12 @@ db = mysql.connector.connect(
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
-@app.get("/")
-async def root():
-    return {"message" : "Home page"}
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
+@app.get("/")
+async def root(request : Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 # ------------------------ PERSON/ FUNCTIONS ------------------------
 def generate_PID() :
@@ -67,7 +70,7 @@ async def user_add(request : Request):
     cursor.close()
 
     # This p_id will be used for login later
-    return {"Message" : "Successfully added user!", "User ID" : p_id}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"You're In! Save your user ID : {p_id}"})
 
 # To render user login form
 @app.get("/user/login", response_class=HTMLResponse)
@@ -126,7 +129,7 @@ async def pet_add(request : Request) :
     db.commit()
 
     cursor.close()
-    return {"Message" : "Successfully added pet!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Added Pet!"})
 
 # To render all details of a user's pet
 @app.get("/pet/view", response_class=HTMLResponse)
@@ -164,7 +167,7 @@ async def pet_delete(request : Request) :
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
-    return {"Message" : "Successfully DELETED pet!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Pet Deleted :("})
 
 # To render user edit form
 @app.get("/user/edit")
@@ -188,7 +191,7 @@ async def user_edit(request : Request) :
     db.commit()
     cursor.close()
 
-    return {"Message" : "Successfully updated user profile!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Profile Edited Successfully!"})
 
 @app.post("/user/delete")
 async def user_delete(request : Request) :
@@ -198,7 +201,7 @@ async def user_delete(request : Request) :
     cursor.execute(sql, (p_id,))
     db.commit()
     cursor.close()
-    return {"Message" : "Successfully deleted profile!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "We're sorry to see you leave :("})
 
 
 # SHOULD DISPLAY AVAILABLE DOCTORS IN CLINICS NEARBY!!!

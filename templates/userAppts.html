@@ -1,34 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Upcoming appointments for a user's pets</title>
-    <style>
-        .pet-block {
-            border: 1px solid #ccc;
-            padding: 10px;
-            margin: 10px 0;
-        }
-    </style>
 </head>
 <body>
     <h2>Upcoming Appointments for user {{p_id}}</h2>
     {% for appt in appts %}
-        <div class="pet-block">
-            <p><strong>Appointment ID</strong> {{ appt[0] }}</p>
-            <p><strong>Clinic ID</strong> {{ appt[1] }}</p>
-            <p><strong>Vet ID</strong> {{ appt[2] }}</p>
-            <p><strong>Pet ID</strong> {{ appt[3] }}</p>
-            <p><strong>Appointment Time</strong> {{ appt[4] }}</p>
-            <p><strong>Appointment Reason </strong> {{ appt[5] }}</p>
 
+    <div class="card bg-base-100 w-96 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title">Pet Name beka?</h2>
+          <p><strong>Appointment ID</strong> {{ appt[0] }}</p>
+          <p><strong>Clinic ID</strong> {{ appt[1] }}</p>
+          <p><strong>Vet ID</strong> {{ appt[2] }}</p>
+          <p><strong>Pet ID</strong> {{ appt[3] }}</p>
+          <p><strong>Appointment Time</strong> {{ appt[4] }}</p>
+          <p><strong>Appointment Reason </strong> {{ appt[5] }}</p>
+          <div class="card-actions justify-end">
             <a href="/user/cancel?appt_id={{ appt[0] }}">
-                <button style="padding: 10px 20px; background-color: #008CBA; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                <button class="btn btn-primary">
                     Cancel Appointment
                 </button>
             </a>
-        </div>
 
+          </div>
+        </div>
+    </div>
     {% endfor %}
 </body>
 </html>
