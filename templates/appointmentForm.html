@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Appointment</title>
+</head>
+<body>
+    <h1>Add Appointment</h1>
+    <form method="POST" action="/appointment/add">
+        <!-- Clinic ID Dropdown -->
+        <label for="c_id">Select Clinic:</label>
+        <select name="c_id" id="c_id" required>
+            {% for clinic_id in clinic_ids %}
+                <option value="{{ clinic_id }}">{{ clinic_id }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <!-- Appointment Time Input -->
+        <label for="appt_time">Appointment Time:</label>
+        <input type="time" name="appt_time" id="appt_time" required><br><br>
+
+        <!-- Appointment Reason Dropdown -->
+        <label for="appt_reason">Appointment Reason:</label>
+        <select name="appt_reason" id="appt_reason" required>
+            <option value="Emergency">Emergency</option>
+            <option value="Vaccination">Vaccination</option>
+            <option value="Routine">Routine</option>
+        </select><br><br>
+
+        <label for="appt_date">Date of appointment</label>
+        <input type="date" id="appt_date" name="appt_date"><br><br>
+
+        <button type="submit">Submit Appointment</button>
+    </form>
+</body>
+</html>

@@ -6,17 +6,9 @@
 </head>
 <body>
     <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
-    <h3>Username: {{ res[0] }}</h3>
-    
-    <!-- <h3>Update Vaccination Details for Pets:</h3>
-    <ul>
-        {% for pet in pets %}
-            <li>
-                ID: {{ pet[0] }}
-                <a href="/vaccination/add?pet_id={{ pet[0] }}&endpoint=/vaccination/add" target="_blank">Update Vaccination</a>
-            </li>
-        {% endfor %}
-    </ul> -->
+
+    <a href="/appointment/view?vet_id={{res[0]}}">View Appointments</a>
+    <a href="/clinic/view?admin_id={{res[0]}}">View Clinic Details</a>
     
     <!-- TODO: View appointments, view clinic details if admin -->
 </body>

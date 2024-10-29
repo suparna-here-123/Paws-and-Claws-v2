@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clinic Details</title>
+    <style>
+        .appt-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Clinic Details</h2>
+    {% for record in res %}
+        <div class="appt-block">
+            <p><strong>Clinic ID:</strong> {{ record[0] }}</p>
+            <p><strong>Clinic Locality:</strong> {{ record[1] }}</p>
+            <p><strong>Clinic Street:</strong> {{ record[2] }}</p>
+            <p><strong>Clinic Door Number:</strong> {{ record[3] }}</p>
+            <p><strong>Opening Time:</strong> {{ record[4] }}</p>
+            <p><strong>Closing Time:</strong> {{ record[5] }}</p>
+        </div>
+    {% endfor %}
+</body>
+</html>

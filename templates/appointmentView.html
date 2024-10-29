@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment Details for Today</title>
+    <style>
+        .appt-block {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h2>Today's Appointments</h2>
+    {% for record in res %}
+        <div class="appt-block">
+            <p><strong>Appointment ID:</strong> {{ record[0] }}</p>
+            <p><strong>Clinic ID:</strong> {{ record[1] }}</p>
+            <p><strong>Pet ID:</strong> {{ record[3] }}</p>
+            <p><strong>Appointment time:</strong> {{ record[4] }}</p>
+            <p><strong>Reason:</strong> {{ record[5] }}</p>
+            <a href="/vaccination/add?pet_id={{ record[3] }}&endpoint=/vaccination/add" target="_blank">Update Vaccination</a>
+            <a href="/appointment/delete?appt_id={{ record[0] }}">Delete Appointment</a>
+        </div>
+    {% endfor %}
+</body>
+</html>

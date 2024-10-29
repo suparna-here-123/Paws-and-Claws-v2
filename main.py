@@ -1,5 +1,5 @@
 import mysql.connector
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -141,7 +141,7 @@ async def pet_edit(request : Request, p_id, pet_id) :
 
 def generate_VID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT v_id FROM vets order by v_id asc LIMIT 1")
+    cursor.execute(f"SELECT vet_id FROM vets order by vet_id asc LIMIT 1")
     last_vid = int(cursor.fetchall()[0][0][1:])
     new_vid = 'V' + str(last_vid - 1)
     cursor.close()
@@ -162,7 +162,7 @@ async def vet_add(request : Request):
     data = tuple(data)
 
     cursor = db.cursor()
-    sql = "INSERT INTO vets VALUE (%s, %s, %s, %s, %s, %s, %s)"
+    sql = "INSERT INTO vets VALUE (%s, %s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
@@ -202,11 +202,11 @@ async def vet_homepage(request: Request, v_id: str):
     vet_details = cursor.fetchone()
     
     # Retrieve pets associated with the vet
-    # cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,)) # need to see how to update the vet id to pets upon booking
-    # pets = cursor.fetchall()
+    cursor.execute("SELECT pet_id FROM pets WHERE vet_id = %s", (v_id,)) # need to see how to update the vet id to pets upon booking
+    pets = cursor.fetchall()
     
     cursor.close()
-    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details}) #, "pets": pets
+    return templates.TemplateResponse("vetHomePage.html", {"request": request, "res": vet_details, "pets": pets}) #, "pets": pets
 
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
@@ -242,3 +242,87 @@ async def vac_add(request : Request, pet_id: str):
 
 # now I need to start with apppointments. When an appointment is fixed, the vet id should be added to the pets table, so that I can view all the pets having appointments for the vet in the vet's homepage.
 # In the vet's homepage, the vet should be able to see all the upcoming pets and their details, their vaccination history, the option to update their vaccination history, the option to book a new appointment, view clinic details if admin, change the time of existing appointments, and delete appointments.
+
+# -------------------------- APPOINTMENT FUNCTIONS --------------------------
+
+# To generate appointment ID
+def generate_APPTID() :
+    cursor = db.cursor()
+    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id asc LIMIT 1")
+    last_aid = int(cursor.fetchall()[0][0][1:])
+    new_aid = 'A' + str(last_aid - 1)
+    cursor.close()
+    return new_aid
+
+# To render appointment registration form
+@app.get("/appointment/add", response_class=HTMLResponse)
+async def render_appt_add(request: Request, pet_id: str, vet_id: str):
+    # Create a cursor and perform the query to get all clinic IDs for the given vet_id
+    cursor = db.cursor()
+    sql = "SELECT c_id FROM employments WHERE vet_id = %s"
+    cursor.execute(sql, (vet_id,))
+    results = cursor.fetchall()  # Fetch all results to handle multiple clinics
+    cursor.close()
+
+    # Check if clinic IDs were found
+    if not results:
+        raise HTTPException(status_code=404, detail="No clinics found for this vet.")
+
+    # Extract clinic IDs into a list
+    clinic_ids = [row[0] for row in results]
+
+    # Render the template with clinic IDs for selection
+    return templates.TemplateResponse("appointmentForm.html", {
+        "request": request,
+        "pet_id": pet_id,
+        "vet_id": vet_id,
+        "clinic_ids": clinic_ids  # Pass list of clinic IDs to the template
+    })
+
+# To add appointment to DB
+@app.post("/appointment/add")
+async def appt_add(request: Request, pet_id: str, vet_id: str):
+    # Get form data submitted by the vet, which includes clinic_id and other appointment details
+    form_data = await request.form()
+    appt_id = generate_APPTID()
+    data = list(value for key, value in form_data.items())
+    data.insert(0, appt_id)
+    updated_data = (data[0], data[1], vet_id, pet_id, *data[2:])
+    data = tuple(updated_data)
+
+    cursor = db.cursor()
+    sql = "INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s, %s)"
+    sql = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+
+    # Confirmation message
+    return {"Message": "Successfully added appointment!"}
+
+# To view the apoointments for that day
+@app.get("/appointment/view", response_class=HTMLResponse)
+async def view_appointments(request: Request, vet_id: str):
+    cursor = db.cursor()
+    sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate()"
+    cursor.execute(sql, (vet_id,))
+    res = cursor.fetchall()
+    return templates.TemplateResponse("appointmentView.html", {"request": request, "res" : res})
+
+# To delete an appointment
+@app.get("/appointment/delete")
+async def appt_delete(request: Request, appt_id: str):
+    cursor = db.cursor()
+    sql = "DELETE FROM appointments WHERE appt_id = %s"
+    cursor.execute(sql, (appt_id,))
+    db.commit()
+    cursor.close()
+    return {"Message": "Successfully deleted appointment!"}
+
+@app.get("/clinic/view", response_class=HTMLResponse)
+async def view_clinic(request: Request, admin_id: str):
+    cursor = db.cursor()
+    sql = "SELECT * FROM clinics WHERE admin_id = %s"
+    cursor.execute(sql, (admin_id,))
+    res = cursor.fetchall()
+    return templates.TemplateResponse("clinicView.html", {"request": request, "res" : res})
