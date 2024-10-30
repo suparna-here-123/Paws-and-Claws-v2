@@ -4,20 +4,14 @@
     <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>User Home Page </title>
-    <style>
-        .card-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center; /* Center cards horizontally */
-            gap: 20px; /* Space between cards */
-        }
-    </style>
 </head>
 <body>
-    <h2>Welcome, {{ res[1] }} {{ res[2] }}</h2>
+    <div class="navbar bg-base-300">
+        <button class="btn btn-ghost text-xl">Welcome, {{res[1]}} {{res[2]}}</button>
+    </div>
 
-    <div class="carousel carousel-end rounded-box">
-        <div class="carousel-item">
+    <div class="carousel carousel-end rounded-box h-[500px]">
+        <div class="carousel-item h-full">
           <div class="card bg-base-100 w-96 shadow-xl">
             <figure class="px-10 pt-10">
                 <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" class="rounded-xl" />

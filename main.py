@@ -203,7 +203,6 @@ async def user_delete(request : Request) :
     cursor.close()
     return templates.TemplateResponse("message.html", {"request": request, "message" : "We're sorry to see you leave :("})
 
-
 # SHOULD DISPLAY AVAILABLE DOCTORS IN CLINICS NEARBY!!!
 @app.get("/user/clinics")
 async def render_user_clinics(request : Request, p_id, pet_id) :
@@ -215,7 +214,7 @@ async def render_user_clinics(request : Request, p_id, pet_id) :
     cursor = db.cursor()
     cursor.execute(sql, (p_id,))
     clinics = cursor.fetchall()
-        
+
     return templates.TemplateResponse("userClinics.html", {"request": request, "p_id" : p_id, "pet_id" : pet_id, "clinics" : clinics})
 
 @app.get("/user/vets")
