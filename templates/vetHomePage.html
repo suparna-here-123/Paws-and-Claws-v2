@@ -15,7 +15,7 @@
     
     <a href="/pet/view?id={{details[0]}}">View Pets</a>
     {% if pets and pets|length > 0 %}
-        <a href="/appointment/add?pet_id={{ pets[0][0] }}&vet_id={{ details[0] }}">Add an Appointment</a>
+        <a href="/appointment/add?vet_id={{ details[0] }}">Book an Appointment</a>
     {% else %}
         <p>No pets registered yet.</p>
     {% endif %}

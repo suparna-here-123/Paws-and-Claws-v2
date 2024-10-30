@@ -5,8 +5,16 @@
     <title>Add Appointment</title>
 </head>
 <body>
-    <h1>Add Appointment</h1>
-    <form method="POST" action="/appointment/add?pet_id={{ pet_id }}&vet_id={{ vet_id }}">
+    <h1>Book an Appointment</h1>
+    <form method="POST" action="/appointment/add?vet_id={{ vet_id }}">
+        <!-- Pet ID Dropdown -->
+        <label for="pet_id">Select Pet:</label>
+        <select name="pet_id" id="pet_id" required>
+            {% for pet in pets %}
+                <option value="{{ pet[0] }}">{{ pet[0] }}</option>
+            {% endfor %}
+        </select><br><br>
+
         <!-- Clinic ID Dropdown -->
         <label for="c_id">Select Clinic:</label>
         <select name="c_id" id="c_id" required>
@@ -33,7 +41,7 @@
             <option value="Routine">Routine</option>
         </select><br><br>
 
-        <label for="appt_date">Date of appointment</label>
+        <label for="appt_date">Date of Appointment:</label>
         <input type="date" id="appt_date" name="appt_date" required><br><br>
 
         <button type="submit">Submit Appointment</button>
@@ -45,14 +53,11 @@
 
         // Function to populate time options within clinic hours
         function populateTimeOptions(openingTime, closingTime) {
-            // Clear existing options
-            apptTimeDropdown.innerHTML = '';
+            apptTimeDropdown.innerHTML = ''; // Clear existing options
 
-            // Parse opening and closing times
             const [openHour, openMinute] = openingTime.split(":").map(Number);
             const [closeHour, closeMinute] = closingTime.split(":").map(Number);
 
-            // Generate time options every 15 minutes within the open-close interval
             let currentHour = openHour;
             let currentMinute = openMinute;
 
@@ -66,7 +71,6 @@
                 optionElement.textContent = timeOption;
                 apptTimeDropdown.appendChild(optionElement);
 
-                // Increment by 30 minutes
                 currentMinute += 30;
                 if (currentMinute >= 60) {
                     currentMinute = 0;

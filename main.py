@@ -215,7 +215,7 @@ async def vet_homepage(request: Request, v_id: str):
     cursor.execute("SELECT * FROM vets WHERE vet_id = %s", (v_id,))
     vet_details = cursor.fetchone()
 
-    cursor.execute("SELECT * FROM pets WHERE vet_id = %s", (v_id,))
+    cursor.execute("SELECT pet_id FROM pets")
     pets = cursor.fetchall()
 
     # Fetch admin_id if the vet is also an admin
@@ -273,63 +273,79 @@ def generate_APPTID() :
     cursor.close()
     return new_aid
 
-# To render appointment registration form
+# To render appointment form for a vet
 @app.get("/appointment/add", response_class=HTMLResponse)
-async def render_appt_add(request: Request, pet_id: str, vet_id: str):
-
+async def render_appt_add(request: Request, vet_id: str):
     cursor = db.cursor()
-    # Modify query to fetch clinic IDs along with their opening and closing times
-    sql = """
+
+    # Fetch clinic IDs with their opening and closing times
+    clinic_sql = """
     SELECT employments.c_id, clinics.c_opensAt, clinics.c_closesAt
     FROM employments 
     JOIN clinics ON employments.c_id = clinics.c_id 
     WHERE vet_id = %s
     """
-    cursor.execute(sql, (vet_id,))
-    results = cursor.fetchall()  # Fetch all results to handle multiple clinics
-    cursor.close()
-
+    cursor.execute(clinic_sql, (vet_id,))
+    clinic_results = cursor.fetchall()
+    
     # Check if clinic IDs were found
-    if not results:
+    if not clinic_results:
+        cursor.close()
         raise HTTPException(status_code=404, detail="No clinics found for this vet.")
 
-    # Structure the data
     clinics_info = [
         {
             "c_id": row[0],
             "opening_time": row[1],
             "closing_time": row[2]
-        } for row in results
+        } for row in clinic_results
     ]
 
-    # Render the template with clinic info for selection
+    # Fetch all pet IDs without filtering by owner
+    pet_sql = "SELECT pet_id FROM pets"
+    cursor.execute(pet_sql)
+    pets = cursor.fetchall()
+    cursor.close()
+
+    if not pets:
+        raise HTTPException(status_code=404, detail="No pets found.")
+    
+    # Debugging information
+    print("Fetched pet results:", pets)  # This should show all pet IDs as tuples in a list
+
+    # Extract only pet IDs
+    pet_results = [row[0] for row in pets]
+    print("List of pet IDs:", pet_results)  # This should display all pet IDs in a list
+
+    # Render the template with clinic info and pet IDs list
     return templates.TemplateResponse("appointmentForm.html", {
         "request": request,
-        "pet_id": pet_id,
         "vet_id": vet_id,
-        "clinics_info": clinics_info  # Pass list of clinics info to the template
+        "clinics_info": clinics_info,
+        "pets": pets  # Pass list of pet IDs to the template
     })
 
 # To add appointment to DB
 @app.post("/appointment/add")
-async def appt_add(request: Request, pet_id: str, vet_id: str):
-    # Get form data submitted by the vet, which includes clinic_id, appointment time, reason, and date
+async def appt_add(request: Request, vet_id: str):
+    # Get form data submitted by the vet, which includes pet_id, clinic_id, appointment time, reason, and date
     form_data = await request.form()
     appt_id = generate_APPTID()
+    pet_id = form_data["pet_id"]
     c_id = form_data["c_id"]
     appt_time = form_data["appt_time"]
     appt_reason = form_data["appt_reason"]
     appt_date = form_data["appt_date"]
-    
+
     # Prepare data tuple for insertion in the expected order of columns
     data = (appt_id, c_id, vet_id, pet_id, appt_time, appt_reason, appt_date)
 
     cursor = db.cursor()
-    
+
     # Insert appointment data into the appointments table
     sql_insert = "INSERT INTO appointments VALUES (%s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql_insert, data)
-    
+
     # Update the vet_id in the pets table
     sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
     cursor.execute(sql_update, (vet_id, pet_id))
