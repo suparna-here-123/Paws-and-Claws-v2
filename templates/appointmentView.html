@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Appointment Details for Today</title>
     <style>
@@ -8,21 +9,34 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin: 10px 0;
+            border-radius: 0.5rem; /* Added for rounded corners */
         }
     </style>
 </head>
-<body>
-    <h2>Today's Appointments</h2>
-    {% for record in res %}
-        <div class="appt-block">
-            <p><strong>Appointment ID:</strong> {{ record[0] }}</p>
-            <p><strong>Clinic ID:</strong> {{ record[1] }}</p>
-            <p><strong>Pet ID:</strong> {{ record[3] }}</p>
-            <p><strong>Appointment time:</strong> {{ record[4] }}</p>
-            <p><strong>Reason:</strong> {{ record[5] }}</p>
-            <a href="/vaccination/add?pet_id={{ record[3] }}&endpoint=/vaccination/add" target="_blank">Update Vaccination</a>
-            <a href="/appointment/delete?appt_id={{ record[0] }}">Delete Appointment</a>
-        </div>
-    {% endfor %}
+<body class="flex justify-center items-center min-h-screen bg-gray-800">
+    <div class="w-full max-w-lg">
+        <h2 class="text-center text-white font-bold mb-4" style="font-size: 2.5rem;">Today's Appointments</h2>
+        
+        {% for record in res %}
+            <div class="card bg-base-100 w-full shadow-xl mb-4">
+                <div class="card-body">
+                    <p><strong>Appointment ID:</strong> {{ record[0] }}</p>
+                    <p><strong>Clinic ID:</strong> {{ record[1] }}</p>
+                    <p><strong>Pet ID:</strong> {{ record[3] }}</p>
+                    <p><strong>Appointment time:</strong> {{ record[4] }}</p>
+                    <p><strong>Reason:</strong> {{ record[5] }}</p>
+                    
+                    <div class="card-actions justify-end">
+                        <a href="/vaccination/add?pet_id={{ record[3] }}&endpoint=/vaccination/add" target="_blank">
+                            <button class="btn btn-primary">Update Vaccination</button>
+                        </a>
+                        <a href="/appointment/delete?appt_id={{ record[0] }}">
+                            <button class="btn btn-primary">Delete Appointment</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 </body>
 </html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+    <link href="/static/output.css" rel="stylesheet">
+    <title>Test DaisyUI</title>
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar bg-info text-primary-content">
+        <button class="btn btn-ghost text-xl">Paws and Claws</button>
+    </div>
+
+    <!-- Flex container for User and Vet options -->
+    <div class="flex justify-center mt-8 space-x-8"> <!-- Added space between cards -->
+        <!-- User options card -->
+        <div class="card bg-base-100 w-97 shadow-xl mx-4"> <!-- Match width and shadow style -->
+            <figure class="px-10 pt-10 h-64 overflow-hidden"> <!-- Padding for image and set height -->
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="User Options" class="rounded-xl object-cover w-full h-full"/> <!-- Rounded corners -->
+            </figure>
+            <div class="card-body items-center text-center"> <!-- Centered content -->
+                <h2 class="card-title">User</h2>
+                <div class="card-actions">
+                    <a href="/user/add">
+                        <button class="btn btn-primary">Register</button>
+                    </a>
+                    <a href="/user/login">
+                        <button class="btn btn-secondary">Login</button>
+                    </a>
+                </div>
+            </div>
+        </div>        
+
+        <!-- Vet options card -->
+        <div class="card bg-base-100 w-97 shadow-xl mx-4"> <!-- Match width and shadow style -->
+            <figure class="px-10 pt-10 h-64 overflow-hidden"> <!-- Padding for image and set height -->
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Vet Options" class="rounded-xl object-cover w-full h-full"/> <!-- Rounded corners -->
+            </figure>
+            <div class="card-body items-center text-center"> <!-- Centered content -->
+                <h2 class="card-title">Vet</h2>
+                <div class="card-actions">
+                    <a href="/vet/add">
+                        <button class="btn btn-primary">Register</button>
+                    </a>
+                    <a href="/vet/login">
+                        <button class="btn btn-secondary">Login</button>
+                    </a>
+                </div>
+            </div>
+        </div>        
+    </div>
+</body>
+</html>

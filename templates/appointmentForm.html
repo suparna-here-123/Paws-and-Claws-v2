@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Add Appointment</title>
 </head>
-<body>
-    <h1>Book an Appointment</h1>
-    <form method="POST" action="/appointment/add?vet_id={{ vet_id }}">
+<body class="flex justify-center items-center min-h-screen bg-gray-800">
+    <form method="POST" action="/appointment/add?vet_id={{ vet_id }}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
+        <h2 class="text-center font-bold mb-4" style="font-size: 2.5rem;">Book an Appointment</h2>
+
         <!-- Pet ID Dropdown -->
-        <label for="pet_id">Select Pet:</label>
-        <select name="pet_id" id="pet_id" required>
+        <label for="pet_id" class="block text-sm font-medium text-gray-700">Select Pet:</label>
+        <select name="pet_id" id="pet_id" required class="input input-bordered input-info w-full max-w-xs mb-4">
             {% for pet in pets %}
                 <option value="{{ pet[0] }}">{{ pet[0] }}</option>
             {% endfor %}
-        </select><br><br>
+        </select>
 
         <!-- Clinic ID Dropdown -->
-        <label for="c_id">Select Clinic:</label>
-        <select name="c_id" id="c_id" required>
+        <label for="c_id" class="block text-sm font-medium text-gray-700">Select Clinic:</label>
+        <select name="c_id" id="c_id" required class="input input-bordered input-info w-full max-w-xs mb-4">
             {% for clinic in clinics_info %}
                 <option value="{{ clinic.c_id }}" 
                         data-opening="{{ clinic.opening_time }}" 
@@ -25,26 +27,26 @@
                     {{ clinic.c_id }}
                 </option>
             {% endfor %}
-        </select><br><br>
+        </select>
 
         <!-- Appointment Time Dropdown -->
-        <label for="appt_time">Appointment Time:</label>
-        <select name="appt_time" id="appt_time" required>
+        <label for="appt_time" class="block text-sm font-medium text-gray-700">Appointment Time:</label>
+        <select name="appt_time" id="appt_time" required class="input input-bordered input-info w-full max-w-xs mb-4">
             <!-- Options will be populated dynamically -->
-        </select><br><br>
+        </select>
 
         <!-- Appointment Reason Dropdown -->
-        <label for="appt_reason">Appointment Reason:</label>
-        <select name="appt_reason" id="appt_reason" required>
+        <label for="appt_reason" class="block text-sm font-medium text-gray-700">Appointment Reason:</label>
+        <select name="appt_reason" id="appt_reason" required class="input input-bordered input-info w-full max-w-xs mb-4">
             <option value="Emergency">Emergency</option>
             <option value="Vaccination">Vaccination</option>
             <option value="Routine">Routine</option>
-        </select><br><br>
+        </select>
 
-        <label for="appt_date">Date of Appointment:</label>
-        <input type="date" id="appt_date" name="appt_date" required><br><br>
+        <label for="appt_date" class="block text-sm font-medium text-gray-700">Date of Appointment:</label>
+        <input type="date" id="appt_date" name="appt_date" required class="input input-bordered input-info w-full max-w-xs mb-4"><br>
 
-        <button type="submit">Submit Appointment</button>
+        <button type="submit" class="btn btn-primary">Submit Appointment</button>
     </form>
 
     <script>

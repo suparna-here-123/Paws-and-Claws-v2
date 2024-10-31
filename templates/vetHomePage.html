@@ -1,25 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Vet Home Page</title>
 </head>
 <body>
-    <h2>Welcome, {{ details[1] }} {{ details[2] }}</h2>
+    <div class="navbar bg-base-300 w-full">
+        <button class="btn btn-ghost text-xl">Welcome, {{ details[1] }} {{ details[2] }}!</button>
+    </div>
 
-    <a href="/appointment/view?vet_id={{ details[0] }}">View Appointments</a>
-    
-    {% if details[0] == admin_id %}
-    <a href="/clinic/view?admin_id={{ details[0] }}">View Clinic Details</a>
-    {% endif %}
-    
-    <a href="/pet/view?id={{details[0]}}">View Pets</a>
-    {% if pets and pets|length > 0 %}
-        <a href="/appointment/add?vet_id={{ details[0] }}">Book an Appointment</a>
-    {% else %}
-        <p>No pets registered yet.</p>
-    {% endif %}
+    <div class="carousel carousel-end rounded-box h-[500px]">
+        <div class="carousel-item h-full">
+            <div class="card bg-base-100 w-96 shadow-xl">
+                <figure class="px-10 pt-10">
+                    <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="View Appointments" class="rounded-xl" />
+                </figure>
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">View Appointments</h2>
+                    <div class="card-actions">
+                        <a href="/appointment/view?vet_id={{ details[0] }}">
+                            <button class="btn btn-primary">View Appointments</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        {% if details[0] == admin_id %}
+        <div class="carousel-item">
+            <div class="card bg-base-100 w-96 shadow-xl">
+                <figure class="px-10 pt-10">
+                    <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Clinic Details" class="rounded-xl" />
+                </figure>
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">View Clinic Details</h2>
+                    <div class="card-actions">
+                        <a href="/clinic/view?admin_id={{ details[0] }}">
+                            <button class="btn btn-primary">View Clinic</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="carousel-item">
+            <div class="card bg-base-100 w-96 shadow-xl">
+                <figure class="px-10 pt-10">
+                    <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="View Pets" class="rounded-xl" />
+                </figure>
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">View Pets</h2>
+                    <div class="card-actions">
+                        <a href="/pet/view?id={{details[0]}}">
+                            <button class="btn btn-primary">View Pets</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if pets and pets|length > 0 %}
+        <div class="carousel-item">
+            <div class="card bg-base-100 w-96 shadow-xl">
+                <figure class="px-10 pt-10">
+                    <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Book Appointment" class="rounded-xl" />
+                </figure>
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">Book an Appointment</h2>
+                    <div class="card-actions">
+                        <a href="/appointment/add?vet_id={{ details[0] }}">
+                            <button class="btn btn-primary">Book Appointment</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="carousel-item">
+            <div class="card bg-base-100 w-96 shadow-xl">
+                <figure class="px-10 pt-10">
+                    <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="No Pets" class="rounded-xl" />
+                </figure>
+                <div class="card-body items-center text-center">
+                    <h2 class="card-title">No Pets Registered</h2>
+                    <p>No pets registered yet.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
 </body>
 </html>
-

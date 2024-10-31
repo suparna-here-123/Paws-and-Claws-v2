@@ -1,5 +1,6 @@
 import mysql.connector
 from fastapi import FastAPI, Request, HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -16,9 +17,12 @@ db = mysql.connector.connect(
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
+# Mount static files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 @app.get("/")
-async def root():
-    return {"message" : "Home page"}
+async def root(request : Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 # ------------------------ PERSON/ FUNCTIONS ------------------------
