@@ -4,54 +4,46 @@
     <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Pet Details of a User</title>
-    <style>
-        .pet-block {
+    <!-- <style>
+        .appt-block {
             border: 1px solid #ccc;
             padding: 10px;
             margin: 10px 0;
+            border-radius: 0.5rem; /* Added for rounded corners */
         }
-    </style>
+    </style> -->
 </head>
-<body class="flex justify-center items-center min-h-screen">
-    {% for record in res %}
-    <div class="card bg-base-100 w-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">{{record[3]}}</h2>
-          <p><strong>ID:</strong> {{ record[0] }}</p>
-          <p><strong>Owner ID:</strong> {{ record[1] }}</p>
-          <p><strong>Owner Name:</strong> {{ p_id }}</p>
-          <p><strong>Type:</strong> {{ record[4] }}</p>
-          <p><strong>Breed:</strong> {{ record[5] }}</p>
-          <p><strong>Gender:</strong> {{ record[6] }}</p>
-          <p><strong>Date of Birth:</strong> {{ record[7] }}</p>
-          <div class="card-actions justify-end">
-            <a href="/pet/vacc?pet_id={{ record[0 ]}}">
-                <button class="btn btn-primary">
-                    Vaccination History
-                </button>
-            </a>
+<body class="flex justify-center items-center min-h-screen bg-gray-800">
+    <div class="w-full max-w-lg">
+        <h2 class="flex justify-center font-bold mb-4" style="font-size: 2.5rem;">Pet details</h2>
+        
+        {% for record in res %}
+        <div class="card bg-base-100 w-100 shadow-xl appt-block">
+            <div class="card-body">
+                <h2 class="card-title">{{record[3]}}</h2>
+                <p><strong>ID:</strong> {{ record[0] }}</p>
+                <p><strong>Owner ID:</strong> {{ record[1] }}</p>
+                <p><strong>Owner Name:</strong> {{ p_id }}</p>
+                <p><strong>Type:</strong> {{ record[4] }}</p>
+                <p><strong>Breed:</strong> {{ record[5] }}</p>
+                <p><strong>Gender:</strong> {{ record[6] }}</p>
+                <p><strong>Date of Birth:</strong> {{ record[7] }}</p>
+                
+                <div class="card-actions justify-end">
+                    <a href="/pet/vacc?pet_id={{ record[0] }}">
+                        <button class="btn btn-primary">Vaccination History</button>
+                    </a>
 
-            <!-- Wrapping button inside form coz that's the only way to send post request-->
-            <form action="/pet/delete" method="POST" style="display: inline;">
-                <input type="hidden" name="p_id" value="{{ record[1] }}">
-                <input type="hidden" name="pet_id" value="{{ record[0] }}">
-                <button type="submit"class="btn btn-primary">
-                    Delete Pet
-                </button>
-            </form>
-
-
-          </div>
+                    <!-- Wrapping button inside form to send a POST request -->
+                    <form action="/pet/delete" method="POST" style="display: inline;">
+                        <input type="hidden" name="p_id" value="{{ record[1] }}">
+                        <input type="hidden" name="pet_id" value="{{ record[0] }}">
+                        <button type="submit" class="btn btn-primary">Delete Pet</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
-
-
-            
-
-
-
-        </div>
-        <br>
-    {% endfor %}
+        {% endfor %}
+    </div>
 </body>
 </html>

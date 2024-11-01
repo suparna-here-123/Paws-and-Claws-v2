@@ -6,8 +6,8 @@
     <title>Add Appointment</title>
 </head>
 <body class="flex justify-center items-center min-h-screen bg-gray-800">
-    <form method="POST" action="/appointment/add?vet_id={{ vet_id }}" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
-        <h2 class="text-center font-bold mb-4" style="font-size: 2.5rem;">Book an Appointment</h2>
+    <form method="POST" action="/appointment/add?vet_id={{ vet_id }}" class="shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
+        <h2 class="font-bold mb-4" style="font-size: 2.5rem;">Book an Appointment</h2>
 
         <!-- Pet ID Dropdown -->
         <label for="pet_id" class="block text-sm font-medium text-gray-700">Select Pet:</label>
@@ -46,7 +46,7 @@
         <label for="appt_date" class="block text-sm font-medium text-gray-700">Date of Appointment:</label>
         <input type="date" id="appt_date" name="appt_date" required class="input input-bordered input-info w-full max-w-xs mb-4"><br>
 
-        <button type="submit" class="btn btn-primary">Submit Appointment</button>
+        <button type="submit" class="btn btn-primary w-full">Submit Appointment</button>
     </form>
 
     <script>
