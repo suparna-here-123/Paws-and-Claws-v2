@@ -64,7 +64,7 @@ async def user_add(request : Request):
     cursor.close()
 
     # This p_id will be used for login later
-    return {"Message" : "Successfully added user!", "User ID" : p_id}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"You're In! Save your user ID : {p_id}"})
 
 # To render user login form
 @app.get("/user/login", response_class=HTMLResponse)
@@ -186,7 +186,7 @@ async def vet_add(request : Request):
     cursor.close()
 
     # This v_id will be used for login later
-    return {"Message" : "Successfully added vet!", "Vet ID" : v_id}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"You're In! Save your vet ID : {v_id}"})
 
 # To render vet login form
 @app.get("/vet/login", response_class=HTMLResponse)
@@ -248,13 +248,15 @@ async def vac_add(request : Request, pet_id: str):
     data = tuple(data)
 
     cursor = db.cursor()
+    sql1= "delete from vaccinations where pet_id = %s"
+    cursor.execute(sql1, (pet_id,))
     sql = "INSERT INTO vaccinations VALUE (%s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
 
     # This p_id will be used for login later
-    return {"Message" : "Successfully added vaccination!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Added the Vaccination!"})
 
 
 # Clinic details will be added manually. From that, I need to source the admin id and check if the admin id is the same as the vet id.
@@ -359,13 +361,13 @@ async def appt_add(request: Request, vet_id: str):
     cursor.close()
 
     # Confirmation message
-    return {"Message": "Successfully added appointment!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Added the Appointment!"})
 
 # To view the apoointments for that day
 @app.get("/appointment/view", response_class=HTMLResponse)
 async def view_appointments(request: Request, vet_id: str):
     cursor = db.cursor()
-    sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate()"
+    sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate() and appt_time > curtime()"
     cursor.execute(sql, (vet_id,))
     res = cursor.fetchall()
     return templates.TemplateResponse("appointmentView.html", {"request": request, "res" : res})
