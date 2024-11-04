@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from datetime import timedelta, date, datetime
 
 # Creating database connection
 db = mysql.connector.connect(
@@ -347,6 +348,23 @@ async def appt_add(request: Request, vet_id: str):
     data = (appt_id, c_id, vet_id, pet_id, appt_time, appt_reason, appt_date)
 
     cursor = db.cursor()
+
+    sql1= "select appt_time, appt_date from appointments"
+    cursor.execute(sql1)
+    res = cursor.fetchall()
+    for i in res:
+        # Given values
+        time_delta = i[0]
+        given_date = i[1]
+
+        # Combine the date and time
+        result_datetime = datetime.combine(given_date, datetime.min.time()) + time_delta
+
+        # Extract date and time separately
+        formatted_time = result_datetime.strftime("%H:%M")  # Time as "HH:MM"
+        formatted_date = result_datetime.strftime("%Y-%m-%d")  # Date as "YYYY-MM-DD"
+        if formatted_time == appt_time and formatted_date == appt_date:
+            return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment time already booked! Please select a different time"})
 
     # Insert appointment data into the appointments table
     sql_insert = "INSERT INTO appointments VALUES (%s, %s, %s, %s, %s, %s, %s)"
