@@ -62,7 +62,7 @@ primary key (c_id, vet_id));
 create table if not exists appointments (
 appt_id varchar(5) primary key,		-- AXXX
 c_id varchar(5),
-vet_id varchar(5),
+vet_id varchar(5),k
 pet_id varchar(5),
 appt_time time,
 appt_reason enum("Emergency", "Vaccination", "Routine"),

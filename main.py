@@ -18,7 +18,7 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/templates", StaticFiles(directory="templates"), name="static")
 
 @app.get("/")
 async def root(request : Request):
@@ -43,7 +43,7 @@ def generate_PetID() :
 
 def generate_ApptID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id desc LIMIT 1")
+    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id desc LIMIT 1")    
     last_id = int(cursor.fetchall()[0][0][1:])
     new_id = 'A' + str(last_id + 1)
     cursor.close()
@@ -254,27 +254,53 @@ async def render_user_vets(request : Request, c_id, pet_id) :
 
     return templates.TemplateResponse("vetsView.html", {"request": request, "pet_id" : pet_id, "c_id" : c_id, "ft" : ft, "clinic_vets" : clinic_vets})
 
-@app.post("/user/book")
-async def user_book(request : Request, c_id, vet_id, pet_id) :
-    form_data = await request.form()
-    form_data = tuple(value for key, value in form_data.items())
-    appt_id = generate_ApptID()
-
-    data = (appt_id,) + (c_id, vet_id, pet_id) + form_data
-    sql = 'INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s)'
-    cursor = db.cursor()
-    cursor.execute(sql, data)
-    db.commit()
-    cursor.close()
-
-    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully booked appointment!"})
-
 def convert(datetime_ele) :
     # Convert closing time to HH:MM
     hours, rem = divmod(datetime_ele.seconds, 3600)
     mins = rem // 60
     formatted = f"{hours:02}:{mins:02}"
     return formatted
+
+@app.post("/user/book")
+async def user_book(request : Request, c_id, vet_id, pet_id) :
+    form_data = await request.form()
+    form_data = tuple(value for key, value in form_data.items())
+    form_time, form_date = form_data[0], form_data[-1]
+
+    # First check if this appointment date and time exists
+    cursor = db.cursor()
+    check_sql = "SELECT * FROM appointments"
+    cursor.execute(check_sql)
+    all_appts = cursor.fetchall()
+
+    for appt in all_appts :
+        appt_c_id, appt_vet_id, appt_time, appt_date = appt[1], appt[2], str(appt[4])[0:5], str(appt[-1])
+        print("Existing appt : ")
+        
+        print("date", type(appt_date), appt_date)
+        print("time", type(appt_time), appt_time)
+        print("cid", type(appt_c_id), appt_c_id)
+        print("vid", type(appt_vet_id), type(appt_vet_id))
+
+        print("Form details : ")
+        
+        print("date", type(form_date), form_date)
+        print("time", type(form_time), form_time)
+        print("cid", type(c_id), c_id)
+        print("vid", type(vet_id), type(vet_id))
+
+        if c_id == appt_c_id and vet_id == appt_vet_id and form_time == appt_time and form_date == appt_date :
+            return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Slot Already Booked :("})
+
+    appt_id = generate_ApptID()
+    data = (appt_id,) + (c_id, vet_id, pet_id) + form_data
+    sql = 'INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s, %s)'
+    
+    cursor.execute(sql, data)
+    db.commit()
+    cursor.close()
+
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully booked appointment!"})
 
 @app.get("/user/upcoming")
 async def user_upcoming(request : Request, p_id) :
@@ -284,7 +310,7 @@ async def user_upcoming(request : Request, p_id) :
     sql_1 = "(SELECT pet_id FROM pets WHERE p_id = %s) AS alias_1"
 
     # Step 2 : Find all appointments with these pet IDs
-    sql_2 = "SELECT appt_id, c_id, vet_id, a.pet_id, appt_time, appt_reason FROM appointments a JOIN " + sql_1 + " ON a.pet_id = alias_1.pet_id"
+    sql_2 = "SELECT appt_id, c_id, vet_id, a.pet_id, appt_time, appt_reason, appt_date FROM appointments a JOIN " + sql_1 + " ON a.pet_id = alias_1.pet_id"
     cursor.execute(sql_2, (p_id,))
     appts = cursor.fetchall()
     f_appts = []

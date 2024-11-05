@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-    <link href="/static/output.css" rel="stylesheet">
+    <link href="/templates/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Vets at Clinic {{ c_id }} </title>
 </head>
@@ -30,7 +30,10 @@
                 <label for="Routine">Routine</label><br>
                 <input type="radio" id="appt_reason" name="appt_reason" value="Vaccination">
                 <label for="Vaccination">Vaccination</label><br>
-
+                
+                <label for="appt_date">Date of Appointment</label><br>
+                <input type="date" id="appt_date" name="appt_date">
+            
                 <div class="card-actions justify-end">
                     <button class="btn btn-primary" type="submit">Confirm Appointment</button>
                     </div>
