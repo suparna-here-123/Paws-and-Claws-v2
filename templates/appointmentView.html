@@ -26,13 +26,23 @@
                     <p><strong>Appointment time:</strong> {{ record[4] }}</p>
                     <p><strong>Reason:</strong> {{ record[5] }}</p>
                     
-                    <div class="card-actions justify-end">
+                    <div class="card-actions justify-center">
                         <a href="/vaccination/add?pet_id={{ record[3] }}&endpoint=/vaccination/add" target="_blank">
                             <button class="btn btn-primary">Update Vaccination</button>
                         </a>
-                        <a href="/appointment/delete?appt_id={{ record[0] }}">
-                            <button class="btn btn-primary">Delete Appointment</button>
-                        </a>
+                        <div class="card-actions justify-end">
+                            <form action="/appointment/delete?appt_id={{record[0]}}" method="post" style="display: inline;">
+                                <!-- <input type="hidden" name="appt_id" value="{{ record[0] }}"> -->
+                                <button type="submit" class="btn btn-primary">Delete Appointment</button>
+                            </form>
+                        </div>
+                        <div class="card-actions justify-end">
+                            <form action="/appointment/finish?appt_id={{record[0]}}&&vet_id={{vet_id}}" method="post" style="display: inline;">
+                                <!-- <input type="hidden" name="appt_id" value="{{ record[0] }}">
+                                <input type="hidden" name="vet_id" value="{{ vet_id }}"> -->
+                                <button type="submit" class="btn btn-primary">Finish Appointment</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

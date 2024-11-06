@@ -7,18 +7,18 @@
 </head>
 <body class="bg-gray-800">
     <!-- Fixed Navbar -->
-    <div class="navbar bg-base-300 w-full fixed top-0 left-0 z-50">
+    <div class="navbar bg-base-300 w-full overflow-x-auto">
         <button class="btn btn-ghost text-xl">Welcome, {{ details[1] }} {{ details[2] }}!</button>
     </div>
 
-    <a href="/vet/enroll?v_id={{ details[0] }}">
+    <!-- <a href="/vet/enroll?v_id={{ details[0] }}">
         <button class="btn btn-primary">Enroll in Clinic</button>
-    </a>
+    </a> -->
 
 
     <!-- Main Content with top padding to avoid overlap -->
     <div class="pt-16">
-        <div class="carousel carousel-end rounded-box h-[500px] flex justify-center">
+        <div class="carousel carousel-end rounded-box h-[500px]">
             <!-- Carousel Item: View Appointments -->
             <div class="carousel-item h-full">
                 <div class="card bg-base-100 w-96 shadow-xl">
@@ -64,14 +64,28 @@
                     <div class="card-body items-center text-center">
                         <h2 class="card-title">View Pets</h2>
                         <div class="card-actions">
-                            <a href="/pet/view?id={{ details[0] }}">
+                            <a href="/pet/vet_view?vet_id={{ details[0] }}">
                                 <button class="btn btn-primary">View Pets</button>
                             </a>
                         </div>
                     </div>
                 </div>
             </div>
-
+            <div class="carousel-item">
+                <div class="card bg-base-100 w-96 shadow-xl">
+                    <figure class="px-10 pt-10">
+                        <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="View Pets" class="rounded-xl" />
+                    </figure>
+                    <div class="card-body items-center text-center">
+                        <h2 class="card-title">Enroll in a Clinic</h2>
+                        <div class="card-actions">
+                            <a href="/vet/enroll?v_id={{ details[0] }}">
+                                <button class="btn btn-primary">Enroll in Clinic</button>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <!-- Conditional Carousel Item: Book Appointment -->
             {% if pets and pets|length > 0 %}
             <div class="carousel-item">

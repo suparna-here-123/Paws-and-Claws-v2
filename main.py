@@ -10,7 +10,7 @@ from datetime import timedelta, date, datetime
 db = mysql.connector.connect(
     host='localhost',
     user='root',
-    password='SuparnaSQL',
+    password='30-nov-03',
     database='susu'
 )
 
@@ -138,7 +138,18 @@ async def pet_add(request : Request) :
 '''
 FOR SUYOG TO EDIT ---------------------------------------------
 '''
-
+#Need to show pet details that are in for an appointment today
+@app.get("/pet/vet_view", response_class=HTMLResponse)
+async def render_pet_vet_view(request: Request, vet_id):
+    cursor=db.cursor()
+    query = """
+        SELECT p.pet_id, p.pet_name, p.pet_species, p.pet_breed, p.pet_gender, p.pet_dob, a.appt_id, a.appt_time, a.appt_reason, a.vet_id
+        FROM pets p JOIN appointments a ON p.pet_id = a.pet_id
+        WHERE a.vet_id = %s AND a.appt_date = curdate() AND a.appt_time > curtime()
+    """
+    cursor.execute(query, (vet_id,))
+    res = cursor.fetchall()
+    return templates.TemplateResponse("petVetView.html", {"request": request, "res" : res})
 
 # To render all details of a user's pet
 @app.get("/pet/view", response_class=HTMLResponse)
@@ -413,18 +424,42 @@ async def vet_enroll(request : Request, v_id : str) :
     # Retrieving clinics where current vet does not work - with option to join
     sql = """SELECT * 
             FROM clinics c
-            RIGHT JOIN (
+            LEFT JOIN (
                 SELECT DISTINCT e.c_id 
                 FROM employments e
                 WHERE e.vet_id != %s
             ) AS clinic_ids ON c.c_id = clinic_ids.c_id;
             """
+    
+    # need to modify this query to show only the clinics where the vet is not already enrolled
     cursor.execute(sql, (v_id,))
     clinics = cursor.fetchall()
     
-    return templates.TemplateResponse("vetEnroll.html", {"request": request, "clinics" : clinics})
+    return templates.TemplateResponse("vetEnroll.html", {"request": request, "clinics" : clinics, "vet_id" : v_id})
+
+@app.post("/vet/enroll")
+async def vet_enroll(request : Request) :
+    form_data = await request.form()
+    v_id, c_id = (value for key, value in form_data.items())
+
+    cursor = db.cursor()
+    sql = "INSERT INTO employments VALUE (%s, %s)"
+    cursor.execute(sql, (c_id, v_id))
+    db.commit()
+    cursor.close()
+
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"Successfully Enrolled! You now work in the clinic {c_id}"})
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
+
+# generate vaccination ID
+def generate_VaccID() :
+    cursor = db.cursor()
+    cursor.execute(f"SELECT vac_id FROM vaccinations order by vac_id desc LIMIT 1")
+    last_vid = int(cursor.fetchall()[0][0][2:])
+    new_vid = 'VA' + str(last_vid - 1)
+    cursor.close()
+    return new_vid
 
 # To render vaccination registration form
 @app.get("/vaccination/add", response_class=HTMLResponse)
@@ -436,13 +471,12 @@ async def render_vac_add(request: Request, pet_id: str):
 async def vac_add(request : Request, pet_id: str):
     form_data = await request.form()
     data = list(value for key, value in form_data.items())
-    data.insert(0, pet_id)
+    data.insert(0, generate_VaccID())
+    data.insert(1, pet_id)
     data = tuple(data)
 
     cursor = db.cursor()
-    sql1= "delete from vaccinations where pet_id = %s"
-    cursor.execute(sql1, (pet_id,))
-    sql = "INSERT INTO vaccinations VALUE (%s, %s, %s)"
+    sql = "INSERT INTO vaccinations VALUE (%s, %s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
@@ -489,7 +523,7 @@ async def render_appt_add(request: Request, vet_id: str):
     # Check if clinic IDs were found
     if not clinic_results:
         cursor.close()
-        raise HTTPException(status_code=404, detail="No clinics found for this vet.")
+        return templates.TemplateResponse("message.html", {"request": request, "message" : "You don't work in any clinic yet, please enroll in a clinic first."})
 
     clinics_info = [
         {
@@ -499,9 +533,9 @@ async def render_appt_add(request: Request, vet_id: str):
         } for row in clinic_results
     ]
 
-    # Fetch all pet IDs without filtering by owner
-    pet_sql = "SELECT pet_id FROM pets"
-    cursor.execute(pet_sql)
+    # Fetch all pet IDs that were previously treated by the vet
+    pet_sql = "SELECT pet_id FROM pets WHERE vet_id = %s"
+    cursor.execute(pet_sql, (vet_id,))
     pets = cursor.fetchall()
     cursor.close()
 
@@ -562,9 +596,9 @@ async def appt_add(request: Request, vet_id: str):
     sql_insert = "INSERT INTO appointments VALUES (%s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql_insert, data)
 
-    # Update the vet_id in the pets table
-    sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
-    cursor.execute(sql_update, (vet_id, pet_id))
+    # # Update the vet_id in the pets table
+    # sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
+    # cursor.execute(sql_update, (vet_id, pet_id))
 
     # Commit the transaction and close the cursor
     db.commit()
@@ -580,17 +614,29 @@ async def view_appointments(request: Request, vet_id: str):
     sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate() and appt_time > curtime()"
     cursor.execute(sql, (vet_id,))
     res = cursor.fetchall()
-    return templates.TemplateResponse("appointmentView.html", {"request": request, "res" : res})
+    return templates.TemplateResponse("appointmentView.html", {"request": request, "res" : res, "vet_id" : vet_id})
+
+# To finish an appointment
+@app.post("/appointment/finish")
+async def appt_finish(request: Request, appt_id: str, vet_id: str):
+    cursor = db.cursor()
+    sql1="UPDATE pets SET vet_id = %s WHERE pet_id = (SELECT pet_id FROM appointments WHERE appt_id = %s)"
+    cursor.execute(sql1, (vet_id, appt_id))
+    sql = "DELETE FROM appointments WHERE appt_id = %s"
+    cursor.execute(sql, (appt_id,))
+    db.commit()
+    cursor.close()
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Finished!"})
 
 # To delete an appointment
-@app.get("/appointment/delete")
+@app.post("/appointment/delete")
 async def appt_delete(request: Request, appt_id: str):
     cursor = db.cursor()
     sql = "DELETE FROM appointments WHERE appt_id = %s"
     cursor.execute(sql, (appt_id,))
     db.commit()
     cursor.close()
-    return {"Message": "Successfully deleted appointment!"}
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Deleted!"})
 
 @app.get("/clinic/view", response_class=HTMLResponse)
 async def view_clinic(request: Request, admin_id: str):

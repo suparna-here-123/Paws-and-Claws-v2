@@ -5,25 +5,35 @@
     <meta charset="UTF-8">
     <title>Clinics To Enroll in For a Vet</title>
 </head>
-    <p>VET ENROLL PAGE</p>
-    <body class="flex justify-center items-center min-h-screen bg-gray-800">
-    {% for c in clinics %}
-    <div class="card bg-base-100 w-100 shadow-xl">
-        <div class="card-body">
-            <h2 class="card-title">{{c[3]}}</h2>
-            <p><strong>ID:</strong> {{ c[0] }}</p>
-            <p><strong>Clinic Locality :</strong> {{ c[1] }}</p>
-            <p><strong>Clinic Street :</strong> {{ c[2] }}</p>
-            <p><strong>Clinic Number :</strong> {{ c[3] }}</p>
-            <p><strong>Opening Time : </strong> {{ c[4] }}</p>
-            <p><strong>Closing Time :</strong> {{ c[5] }}</p>
-            <div class="card-actions justify-end">
-            <a href="/">
-                <button class="btn btn-primary">
-                    Join Clinic
-                </button>
-            </a>
-    </div>
-    {% endfor %}
+<body class="flex justify-center items-center min-h-screen bg-gray-800">
+    <!-- Page Heading -->
+    <div class="w-full max-w-lg">
+        <h2 class="text-center text-white font-bold mb-4" style="font-size: 2.5rem;">Clinics available for enrollment</h2>
+        <!-- Clinic Cards -->
+        <div class="w-full max-w-lg">
+            {% for c in clinics %}
+            <div class="card bg-base-100 shadow-xl w-full mb-4">
+                <div class="card-body">
+                    <!-- <h2 class="card-title">{{ c[3] }}</h2> -->
+                    <p><strong>ID:</strong> {{ c[0] }}</p>
+                    <p><strong>Clinic Locality:</strong> {{ c[1] }}</p>
+                    <p><strong>Clinic Street:</strong> {{ c[2] }}</p>
+                    <p><strong>Clinic Number:</strong> {{ c[3] }}</p>
+                    <p><strong>Opening Time:</strong> {{ c[4] }}</p>
+                    <p><strong>Closing Time:</strong> {{ c[5] }}</p>
 
+                    <!-- Enrollment Form -->
+                    <div class="card-actions justify-end">
+                        <form action="/vet/enroll" method="post" style="display: inline;">
+                            <input type="hidden" name="v_id" value="{{ vet_id }}">
+                            <input type="hidden" name="c_id" value="{{ c[0] }}">
+                            <button type="submit" class="btn btn-primary">Join Clinic</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
 </html>
