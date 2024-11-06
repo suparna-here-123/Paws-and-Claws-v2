@@ -14,23 +14,6 @@ db = mysql.connector.connect(
     database='susu'
 )
 
-cursor=db.cursor()
-
-trigger = """
-    CREATE TRIGGER update_vet_id
-    AFTER DELETE ON appointments
-    FOR EACH ROW
-    BEGIN
-        UPDATE pets
-        set vet_id = NEW.vet_id
-        where pet_id = NEW.pet_id;
-    END;
-    """
-
-cursor.execute(trigger, multi=True)
-db.commit()
-cursor.close()
-
 # Creating an instance of the App
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
