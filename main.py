@@ -18,7 +18,7 @@ cursor=db.cursor()
 
 trigger = """
     CREATE TRIGGER update_vet_id
-    AFTER INSERT ON appointments
+    AFTER DELETE ON appointments
     FOR EACH ROW
     BEGIN
         UPDATE pets

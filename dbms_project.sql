@@ -69,3 +69,14 @@ appt_reason enum("Emergency", "Vaccination", "Routine"),
 foreign key (c_id) references clinics(c_id),
 foreign key (vet_id) references vets(vet_id),
 foreign key(pet_id) references pets(pet_id));
+
+DELIMITER //
+CREATE TRIGGER update_vet_id
+    AFTER DELETE ON appointments
+    FOR EACH ROW
+    BEGIN
+        UPDATE pets
+        set vet_id = NEW.vet_id
+        where pet_id = NEW.pet_id;
+    END  //
+DELIMITER ;
