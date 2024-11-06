@@ -455,7 +455,7 @@ async def vet_enroll(request : Request) :
 # generate vaccination ID
 def generate_VaccID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT vac_id FROM vaccinations order by vac_id desc LIMIT 1")
+    cursor.execute(f"SELECT vac_id FROM vaccinations order by vac_id asc LIMIT 1")
     last_vid = int(cursor.fetchall()[0][0][2:])
     new_vid = 'VA' + str(last_vid - 1)
     cursor.close()
