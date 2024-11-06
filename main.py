@@ -611,7 +611,7 @@ async def appt_add(request: Request, vet_id: str):
 @app.get("/appointment/view", response_class=HTMLResponse)
 async def view_appointments(request: Request, vet_id: str):
     cursor = db.cursor()
-    sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate() and appt_time > curtime()"
+    sql = "SELECT * FROM appointments WHERE vet_id = %s and appt_date = curdate()"
     cursor.execute(sql, (vet_id,))
     res = cursor.fetchall()
     return templates.TemplateResponse("appointmentView.html", {"request": request, "res" : res, "vet_id" : vet_id})
