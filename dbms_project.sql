@@ -9,7 +9,7 @@ p_phone BIGINT unique,
 p_locality varchar(25),
 p_street varchar(25),
 p_houseNum int,
-);
+p_password varchar(25));
 
 create table if not exists vets (
 vet_id varchar(5) primary key,		-- VXXX
@@ -18,7 +18,8 @@ vet_lastName varchar(25),
 vet_phone BIGINT unique,
 vet_degree enum('Diploma', 'Bachelors', 'Doctor of Medicine'),
 vet_experience int,
-vet_fee int);
+vet_fee int,
+password varchar(25));
 
 create table if not exists pets (
 pet_id varchar(5) primary key,	-- PEXXX
@@ -48,7 +49,8 @@ c_locality varchar(25),
 c_street varchar(25),
 c_doorNum int,
 c_opensAt time,
-c_closesAt time);
+c_closesAt time,
+admin_id varchar(25));
 
  
 create table if not exists employments(

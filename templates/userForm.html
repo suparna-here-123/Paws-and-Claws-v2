@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-    <link href="/templates/output.css" rel="stylesheet">
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>User Registration Form</title>
 </head>
-<body class="flex justify-center items-center min-h-screen bg-gray-800">
-    <form action="/user/add/" method="post" class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+<body class="flex justify-center items-center min-h-screen">
+    <form action="/user/add/" method="post" class="shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 style="font-size: 2.5rem;" class="text-center font-bold mb-4">User Registration</h2>
 
         <input class="input input-bordered input-info w-full max-w-xs" placeholder="First Name" type="text" id="firstName" name="firstName" required><br><br>
 
@@ -16,15 +17,13 @@
 
         <input class="input input-bordered input-info w-full max-w-xs" type="text" placeholder="Locality" id="locality" name="locality" required><br><br>
 
-
         <input class="input input-bordered input-info w-full max-w-xs" type="text" placeholder="Street" id="street" name="street" required><br><br>
 
         <input class="input input-bordered input-info w-full max-w-xs" type="number" placeholder="House Number" id="houseNum" name="houseNum" required><br><br>
         
         <input class="input input-bordered input-info w-full max-w-xs" type="password" placeholder="Password" id="password" name="password" required><br><br>
 
-
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-primary w-full" type="submit">Submit</button>
     </form>
 </body>
 </html>

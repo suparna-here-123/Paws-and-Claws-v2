@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link href="/static/output.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Vaccination Form</title>
+</head>
+<body class="flex justify-center items-center min-h-screen bg-gray-800">
+    <form action="{{ endpoint }}" method="post" class="bg-black shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-lg">
+        <h2 class="text-center font-bold mb-6" style="font-size: 2.5rem;">Vaccination Details of {{ pet_id }}</h2>
+
+        <!-- Vaccine Name Options -->
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Vaccine Name</label>
+            <div class="flex flex-col space-y-2">
+                <label class="flex items-center">
+                    <input type="radio" name="vaccine_name" value="Rabies" class="radio radio-primary mr-2">
+                    <span>Rabies</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="vaccine_name" value="Flu" class="radio radio-primary mr-2">
+                    <span>Flu</span>
+                </label>
+                <label class="flex items-center">
+                    <input type="radio" name="vaccine_name" value="S3P" class="radio radio-primary mr-2">
+                    <span>S3P</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Vaccination Date -->
+        <div class="mb-4">
+            <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Vaccination Date</label>
+            <input type="date" id="date" name="date" required class="input input-bordered input-info w-full max-w-xs">
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center mt-6">
+            <button type="submit" class="btn btn-primary w-full">Submit</button>
+        </div>
+    </form>
+</body>
+</html>

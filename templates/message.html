@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-    <link href="/templates/output.css" rel="stylesheet">
+    <link href="/static/output.css" rel="stylesheet">
     <meta charset="UTF-8">
     <title>EMessage</title>
 </head>
 <body>
-    <div class="mockup-code">
-        <pre data-prefix="1"><code>Verifying...</code></pre>
-        <pre data-prefix="2"><code>Adding...</code></pre>
-        <pre data-prefix="3" class="bg-warning text-warning-content"><code>{{message}}</code></pre>
-      </div>
+
+    <!-- Main Content -->
+    <div>
+        <div class="mockup-code mb-4 rounded-lg shadow-lg bg-base-100">
+            <pre data-prefix="1"><code>Verifying...</code></pre>
+            <pre data-prefix="2"><code>Adding...</code></pre>
+            <pre data-prefix="3" class="bg-warning text-warning-content"><code>{{message}}</code></pre>
+        </div>
+        
+        <!-- Back to Parent Page Button -->
+        <a href="javascript:history.back()" class="btn btn-primary mt-4">Back to Parent Page</a>
+    </div>
+
 </body>
+</html>

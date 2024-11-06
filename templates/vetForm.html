@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <link href="/static/output.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Vet Registration Form</title>
+</head>
+<body class="flex justify-center items-center min-h-screen">
+    <form action="/vet/add/" method="post" class="shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <h2 style="font-size: 2.5rem;" class="text-center font-bold mb-4">Vet Registration</h2>
+
+        <input class="input input-bordered input-info w-full max-w-xs" placeholder="First Name" type="text" id="firstName" name="firstName" required><br><br>
+
+        <input class="input input-bordered input-info w-full max-w-xs" placeholder="Last Name" type="text" id="lastName" name="lastName" required><br><br>
+
+        <input class="input input-bordered input-info w-full max-w-xs" type="tel" placeholder="Phone" id="phone" name="phone" required><br><br>
+
+        <div class="border border-info input-info input-bordered rounded-lg px-8 pt-6 pb-6 mb-6 max-w-xs w-full mb-2">
+            <label class="block mb-4 font-bold">Degree</label>
+            
+            <div class="flex items-center mb-4">
+                <input type="radio" id="diploma" name="degree" value="Diploma" required class="mr-4">
+                <label for="diploma">Diploma</label>
+            </div>
+            <div class="flex items-center mb-4">
+                <input type="radio" id="bachelors" name="degree" value="Bachelors" required class="mr-4">
+                <label for="bachelors">Bachelors</label>
+            </div>
+            <div class="flex items-center mb-4">
+                <input type="radio" id="doctor_of_medicine" name="degree" value="Doctor of Medicine" required class="mr-4">
+                <label for="doctor_of_medicine">Doctor of Medicine</label>
+            </div>
+        </div>        
+
+        <input class="input input-bordered input-info w-full max-w-xs" placeholder="Experience" type="text" id="experience" name="experience" required><br><br>
+
+        <input class="input input-bordered input-info w-full max-w-xs" placeholder="Fee" type="number" id="fee" name="fee" required><br><br>
+
+        <input class="input input-bordered input-info w-full max-w-xs" placeholder="Password" type="password" id="password" name="password" required><br><br>
+
+        <button class="btn btn-primary w-full" type="submit">Submit</button>
+    </form>
+</body>
+</html>
