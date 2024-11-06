@@ -14,6 +14,23 @@ db = mysql.connector.connect(
     database='susu'
 )
 
+cursor=db.cursor()
+
+trigger = """
+    CREATE TRIGGER update_vet_id
+    AFTER INSERT ON appointments
+    FOR EACH ROW
+    BEGIN
+        UPDATE pets
+        set vet_id = NEW.vet_id
+        where pet_id = NEW.pet_id;
+    END;
+    """
+
+cursor.execute(trigger, multi=True)
+db.commit()
+cursor.close()
+
 # Creating an instance of the App
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -371,9 +388,9 @@ async def appt_add(request: Request, vet_id: str):
     sql_insert = "INSERT INTO appointments VALUES (%s, %s, %s, %s, %s, %s, %s)"
     cursor.execute(sql_insert, data)
 
-    # Update the vet_id in the pets table
-    sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
-    cursor.execute(sql_update, (vet_id, pet_id))
+    # # Update the vet_id in the pets table
+    # sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
+    # cursor.execute(sql_update, (vet_id, pet_id))
 
     # Commit the transaction and close the cursor
     db.commit()
