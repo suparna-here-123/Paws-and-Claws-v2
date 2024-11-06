@@ -66,6 +66,18 @@ vet_id varchar(5),k
 pet_id varchar(5),
 appt_time time,
 appt_reason enum("Emergency", "Vaccination", "Routine"),
+appt_date date,
 foreign key (c_id) references clinics(c_id) on delete cascade,
 foreign key (vet_id) references vets(vet_id) on delete cascade,
 foreign key(pet_id) references pets(pet_id) on delete cascade);
+
+-- Procedure to order appointments by date and reason (Emergency > Vaccination > Routine)
+create procedure GetAppts(IN in_CID varchar(5), IN in_VID varchar(5))
+begin
+ select * from appointments a
+ where a.c_id = 'C300' and a.vet_id = 'V500'
+ order by appt_date, appt_reason;
+end //
+delimiter ;
+
+-- Function to return number of 

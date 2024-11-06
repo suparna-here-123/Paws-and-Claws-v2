@@ -275,22 +275,10 @@ async def user_book(request : Request, c_id, vet_id, pet_id) :
 
     for appt in all_appts :
         appt_c_id, appt_vet_id, appt_time, appt_date = appt[1], appt[2], str(appt[4])[0:5], str(appt[-1])
-        print("Existing appt : ")
-        
-        print("date", type(appt_date), appt_date)
-        print("time", type(appt_time), appt_time)
-        print("cid", type(appt_c_id), appt_c_id)
-        print("vid", type(appt_vet_id), type(appt_vet_id))
 
-        print("Form details : ")
-        
-        print("date", type(form_date), form_date)
-        print("time", type(form_time), form_time)
-        print("cid", type(c_id), c_id)
-        print("vid", type(vet_id), type(vet_id))
-
-        if c_id == appt_c_id and vet_id == appt_vet_id and form_time == appt_time and form_date == appt_date :
-            return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Slot Already Booked :("})
+        # Preventing double booking of appointment for SAME(DOC, DATE, TIME)
+        if vet_id == appt_vet_id and  form_time == appt_time and form_date == appt_date :
+            return templates.TemplateResponse("message.html", {"request": request, "message" : "Doctor isn't free at this time :("})
 
     appt_id = generate_ApptID()
     data = (appt_id,) + (c_id, vet_id, pet_id) + form_data
