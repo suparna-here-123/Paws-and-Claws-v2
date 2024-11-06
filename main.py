@@ -424,11 +424,8 @@ async def vet_enroll(request : Request, v_id : str) :
     # Retrieving clinics where current vet does not work - with option to join
     sql = """SELECT * 
             FROM clinics c
-            LEFT JOIN (
-                SELECT DISTINCT e.c_id 
-                FROM employments e
-                WHERE e.vet_id != %s
-            ) AS clinic_ids ON c.c_id = clinic_ids.c_id;
+            LEFT JOIN employments e ON c.c_id = e.c_id AND e.vet_id = %s
+            WHERE e.c_id IS NULL;
             """
     
     # need to modify this query to show only the clinics where the vet is not already enrolled
