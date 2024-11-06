@@ -449,15 +449,6 @@ async def vet_enroll(request : Request) :
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
 
-# generate vaccination ID
-def generate_VaccID() :
-    cursor = db.cursor()
-    cursor.execute(f"SELECT vac_id FROM vaccinations order by vac_id asc LIMIT 1")
-    last_vid = int(cursor.fetchall()[0][0][2:])
-    new_vid = 'VA' + str(last_vid - 1)
-    cursor.close()
-    return new_vid
-
 # To render vaccination registration form
 @app.get("/vaccination/add", response_class=HTMLResponse)
 async def render_vac_add(request: Request, pet_id: str):
@@ -468,12 +459,11 @@ async def render_vac_add(request: Request, pet_id: str):
 async def vac_add(request : Request, pet_id: str):
     form_data = await request.form()
     data = list(value for key, value in form_data.items())
-    data.insert(0, generate_VaccID())
-    data.insert(1, pet_id)
+    data.insert(0, pet_id)
     data = tuple(data)
 
     cursor = db.cursor()
-    sql = "INSERT INTO vaccinations VALUE (%s, %s, %s, %s)"
+    sql = "INSERT INTO vaccinations VALUE (%s, %s, %s)"
     cursor.execute(sql, data)
     db.commit()
     cursor.close()

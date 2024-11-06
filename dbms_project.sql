@@ -36,12 +36,12 @@ foreign key(p_id) references people(p_id) on delete cascade,
 foreign key (vet_id) references vets(vet_id) on delete cascade); -- Upcoming appointment du ID
 
 create table if not exists vaccinations (
-vac_id varchar(5),				-- VAXX
-pet_id varchar(5),
-primary key (vac_id, pet_id),
-vac_name enum("Rabies", "Flu", "S3P"),
-vac_date date,
-foreign key (pet_id) references pets(pet_id) on delete cascade);
+    pet_id varchar(5),
+    vac_name enum('Rabies', 'Flu', 'S3P'),
+    vac_date date,
+    primary key (pet_id, vac_name, vac_date),
+    foreign key (pet_id) references pets(pet_id) on delete cascade
+);
 
 create table if not exists clinics (
 c_id varchar(5) primary key,	-- CXXX
