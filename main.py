@@ -607,10 +607,16 @@ async def view_appointments(request: Request, vet_id: str):
 @app.post("/appointment/finish")
 async def appt_finish(request: Request, appt_id: str, vet_id: str):
     cursor = db.cursor()
-    sql1="UPDATE pets SET vet_id = %s WHERE pet_id = (SELECT pet_id FROM appointments WHERE appt_id = %s)"
-    cursor.execute(sql1, (vet_id, appt_id))
-    sql = "DELETE FROM appointments WHERE appt_id = %s"
-    cursor.execute(sql, (appt_id,))
+    sql_select = "SELECT pet_id FROM appointments WHERE appt_id = %s"
+    cursor.execute(sql_select, (appt_id,))
+    result = cursor.fetchone()
+    if result:
+        pet_id = result[0]
+        sql_update = "UPDATE pets SET vet_id = %s WHERE pet_id = %s"
+        cursor.execute(sql_update, (vet_id, pet_id))
+        db.commit()
+    # sql = "DELETE FROM appointments WHERE appt_id = %s"
+    # cursor.execute(sql, (appt_id,))
     db.commit()
     cursor.close()
     return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Finished!"})

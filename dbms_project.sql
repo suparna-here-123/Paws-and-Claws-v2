@@ -82,4 +82,13 @@ begin
 end //
 delimiter ;
 
--- Function to return number of 
+-- Trigger to delete the appointment after the vet id is updated into the vets table (when you finish the appointment)
+
+delimiter //
+create trigger finish_appt
+after update on pets
+for each row
+begin 
+	delete from appointments where pet_id = new.pet_id and vet_id = new.vet_id;
+end //
+delimiter ;
