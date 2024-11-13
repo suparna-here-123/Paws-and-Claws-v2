@@ -1,16 +1,21 @@
-import mysql.connector
+import mysql.connector, os
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from datetime import timedelta, date, datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Creating database connection
 db = mysql.connector.connect(
     host='localhost',
+    #user=os.getenv('USER'),
     user='root',
-    password='30-nov-03',
+    #password=os.getenv('PASSWORD'),
+    password='SuparnaSQL',
     database='susu'
 )
 
@@ -19,7 +24,7 @@ app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/images", StaticFiles(directory="images"), name="images")
 
 @app.get("/")
 async def root(request : Request):
