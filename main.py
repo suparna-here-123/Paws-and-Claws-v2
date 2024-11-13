@@ -12,10 +12,8 @@ load_dotenv()
 # Creating database connection
 db = mysql.connector.connect(
     host='localhost',
-    #user=os.getenv('USER'),
-    user='root',
-    #password=os.getenv('PASSWORD'),
-    password='SuparnaSQL',
+    user=os.getenv('USER'),
+    password=os.getenv('PASSWORD'),
     database='susu'
 )
 
