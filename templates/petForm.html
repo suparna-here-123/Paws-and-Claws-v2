@@ -9,7 +9,8 @@
 <body class="flex justify-center items-center min-h-screen">
     <!-- <h2>Pet of {{ p_id }}</h2> -->
     <form action="/pet/add" method="post" class="bg-base-200 w-100 p-10 rounded-lg shadow-lg">
-        <input type="hidden" id="p_id" name="p_id" value={{ p_id }} readonly><br><br>
+        <h2 style="font-size: 2.5rem;" class="text-center font-bold mb-4">Add Your Pet!</h2>
+        <input type="hidden" id="p_id" name="p_id" value={{ p_id }} readonly><br>
 
         <input type="text" class="input input-bordered input-info w-full max-w-xs" placeholder="Pet Name" id="pet_name" name="pet_name"><br><br>
 
@@ -35,7 +36,7 @@
 
         <input class="input input-bordered input-info w-full max-w-xs" type="date" id="vac_date" name="vac_date"><br><br>
 
-        <button class="btn btn-primary" type="submit">Submit</button>
+        <button class="btn btn-primary w-full" type="submit">Submit</button>
     </form>
 </body>
 

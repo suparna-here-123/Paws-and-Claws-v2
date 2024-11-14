@@ -6,27 +6,29 @@
     <title>Upcoming appointments for a user's pets</title>
 </head>
 <body class="flex justify-center items-center min-h-screen bg-gray-800">
-    <h2>Upcoming Appointments for user {{p_id}}</h2>
-    {% for appt in appts %}
-    <div class="card bg-base-100 w-96 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">Pet Name beka?</h2>
-          <p><strong>Appointment ID</strong> {{ appt[0] }}</p>
-          <p><strong>Clinic ID</strong> {{ appt[1] }}</p>
-          <p><strong>Vet ID</strong> {{ appt[2] }}</p>
-          <p><strong>Pet ID</strong> {{ appt[3] }}</p>
-          <p><strong>Appointment Time</strong> {{ appt[4] }}</p>
-          <p><strong>Appointment Reason </strong> {{ appt[5] }}</p>
-          <div class="card-actions justify-end">
-            <a href="/user/cancel?appt_id={{ appt[0] }}">
-                <button class="btn btn-primary">
-                    Cancel Appointment
-                </button>
-            </a>
-
-          </div>
+    <div class="w-full max-w-lg">
+        <h2 class="text-center font-bold mb-4" style="font-size: 2.5rem;">Upcoming Appointments for {{ p_id }}</h2>
+        
+        {% for appt in appts %}
+        <div class="card bg-base-100 w-96 shadow-xl mb-4">
+            <div class="card-body">
+                <h2 class="card-title">{{ appt[4] }}</h2>
+                <p><strong>Appointment ID:</strong> {{ appt[0] }}</p>
+                <p><strong>Clinic ID:</strong> {{ appt[1] }}</p>
+                <p><strong>Vet ID:</strong> {{ appt[2] }}</p>
+                <p><strong>Pet ID:</strong> {{ appt[3] }}</p>
+                <p><strong>Pet Name:</strong> {{ appt[4] }}</p>
+                <p><strong>Appointment Time:</strong> {{ appt[5] }}</p>
+                <p><strong>Appointment Reason:</strong> {{ appt[6] }}</p>
+                
+                <div class="card-actions justify-end">
+                    <a href="/user/cancel?appt_id={{ appt[0] }}">
+                        <button class="btn btn-primary">Cancel Appointment</button>
+                    </a>
+                </div>
+            </div>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
 </body>
 </html>

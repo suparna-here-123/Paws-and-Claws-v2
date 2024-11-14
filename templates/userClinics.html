@@ -6,27 +6,27 @@
     <title>Clinics Near Me</title>
 </head>
 <body class="flex justify-center items-center min-h-screen bg-gray-800">
-    <h2>Clinics Near Me {{ p_id }} for pet {{ pet_id }}</h2>
+    <div class="w-full max-w-lg">
+        <h2 class="text-center font-bold mb-4" style="font-size: 2.5rem;">Clinics Near {{ p_id }}</h2>
+        
         {% for c in clinics %}
-        <div class="card bg-base-100 w-96 shadow-xl">
+        <div class="card bg-base-100 w-96 shadow-xl mb-4">
             <div class="card-body">
-              <h2 class="card-title">{{c[0]}}</h2>
-              <p><strong>Clinic Locality</strong> {{ c[1] }}</p>
-              <p><strong>Clinic Street</strong> {{ c[2] }}</p>
-              <p><strong>Clinic Door </strong> #{{ c[3] }}</p>
-              <p><strong>Opens At</strong> {{ c[4] }}</p>
-              <p><strong>Closes at</strong> {{ c[5] }}</p>
-  
-              <div class="card-actions justify-end">
-                <a href="/user/vets?c_id={{ c[0] }}&pet_id={{ pet_id }}">
-                    <button class="btn btn-primary">
-                        View Doctors
-                    </button>
-                </a>
+                <h2 class="card-title">{{ c[0] }}</h2>
+                <p><strong>Clinic Locality:</strong> {{ c[1] }}</p>
+                <p><strong>Clinic Street:</strong> {{ c[2] }}</p>
+                <p><strong>Clinic Door:</strong> #{{ c[3] }}</p>
+                <p><strong>Opens At:</strong> {{ c[4] }}</p>
+                <p><strong>Closes At:</strong> {{ c[5] }}</p>
+
+                <div class="card-actions justify-end">
+                    <a href="/user/vets?c_id={{ c[0] }}&pet_id={{ pet_id }}">
+                        <button class="btn btn-primary">View Doctors</button>
+                    </a>
+                </div>
             </div>
         </div>
-        </div>
         {% endfor %}
-
+    </div>
 </body>
 </html>

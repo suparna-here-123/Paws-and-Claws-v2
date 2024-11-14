@@ -318,16 +318,16 @@ async def user_upcoming(request : Request, p_id) :
     cursor = db.cursor()
 
     # Step 1 : Find all pets of this user
-    sql_1 = "(SELECT pet_id FROM pets WHERE p_id = %s) AS alias_1"
+    sql_1 = "(SELECT pet_id, pet_name FROM pets WHERE p_id = %s) AS alias_1"
 
     # Step 2 : Find all appointments with these pet IDs
-    sql_2 = "SELECT appt_id, c_id, vet_id, a.pet_id, appt_time, appt_reason, appt_date FROM appointments a JOIN " + sql_1 + " ON a.pet_id = alias_1.pet_id"
+    sql_2 = "SELECT appt_id, c_id, vet_id, a.pet_id, alias_1.pet_name, appt_time, appt_reason, appt_date FROM appointments a JOIN " + sql_1 + " ON a.pet_id = alias_1.pet_id where appt_date >= curdate() and appt_time >= curtime()"
     cursor.execute(sql_2, (p_id,))
     appts = cursor.fetchall()
     f_appts = []
     for appt in appts :
         new = list(appt)
-        new[4] = convert(new[4])
+        new[5] = convert(new[5])
         f_appts.append(new)
 
     return templates.TemplateResponse("userAppts.html", {"request": request, \
@@ -393,7 +393,6 @@ async def vet_login(request : Request) :
     cursor.execute(sql, (v_id,))
     res = cursor.fetchall()
     cursor.close()
-
     if res[0][0] == pwd :
         # Default redirect makes POST request, changing status code match GET
         return RedirectResponse(url=f'/vet/homepage/{v_id}', status_code=302)
