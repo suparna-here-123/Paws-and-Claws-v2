@@ -16,7 +16,12 @@
         </div>
         
         <!-- Back to Parent Page Button -->
-        <a href="javascript:history.back()" class="btn btn-primary mt-4">Back to Parent Page</a>
+        {% if type and p_id %}
+        <a href="/{{ type }}/homepage/{{ id }}" class="btn btn-primary mt-4">Back to Home Page</a>
+        {% else %}
+            <a href="javascript:history.back()" class="btn btn-primary mt-4">Back</a>
+        {% endif %}
+    
     </div>
 
 </body>

@@ -23,6 +23,7 @@ templates = Jinja2Templates(directory="templates")
 
 # Mount static files
 app.mount("/images", StaticFiles(directory="images"), name="images")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 async def root(request : Request):
@@ -48,9 +49,9 @@ def generate_PetID() :
 
 def generate_ApptID() :
     cursor = db.cursor()
-    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id desc LIMIT 1")    
+    cursor.execute(f"SELECT appt_id FROM appointments order by appt_id asc LIMIT 1")    
     last_id = int(cursor.fetchall()[0][0][1:])
-    new_id = 'A' + str(last_id + 1)
+    new_id = 'A' + str(last_id - 1)
     cursor.close()
     return new_id
 
@@ -118,7 +119,7 @@ async def render_pet_add(request: Request, p_id):
 
 # To actually add pet
 @app.post("/pet/add")
-async def pet_add(request : Request) :
+async def pet_add(request : Request, ) :
     pet_id = generate_PetID()
     form_data = await request.form()
     form_data = tuple(value for key, value in form_data.items())
@@ -136,7 +137,8 @@ async def pet_add(request : Request) :
     cursor.close()
 
     # Redirect to userHomePage here
-    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Added Pet!"})
+    p_id = form_data[0]
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Successfully Added Pet!", "id" : p_id, "type" : "user"})
 
 '''
 FOR SUYOG TO EDIT ---------------------------------------------
@@ -184,13 +186,14 @@ async def render_pet_vacc(request : Request, pet_id) :
 async def pet_delete(request : Request) :
     form_data = await request.form()
     data = tuple((value for key, value in form_data.items()))
+    p_id = data[0]
     
     cursor = db.cursor()
     sql = 'DELETE FROM pets WHERE p_id = %s and pet_id = %s'
     cursor.execute(sql, data)
     db.commit()
     cursor.close()
-    return templates.TemplateResponse("message.html", {"request": request, "message" : "Pet Deleted :("})
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Pet Deleted :(", "id" : p_id, "type" : "user"})
 
 # To render user edit form
 @app.get("/user/edit")
@@ -214,7 +217,7 @@ async def user_edit(request : Request) :
     db.commit()
     cursor.close()
 
-    return templates.TemplateResponse("message.html", {"request": request, "message" : "Profile Edited Successfully!"})
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Profile Edited Successfully!", "id" : p_id, "type" : "user"})
 
 @app.post("/user/delete")
 async def user_delete(request : Request) :
@@ -303,7 +306,9 @@ async def user_book(request : Request, c_id, vet_id, pet_id) :
         if vet_id == appt_vet_id and  form_time == appt_time and form_date == appt_date :
             return templates.TemplateResponse("message.html", {"request": request, "message" : "Doctor isn't free at this time :("})
 
+    
     appt_id = generate_ApptID()
+    print(appt_id)
     data = (appt_id,) + (c_id, vet_id, pet_id) + form_data
     sql = 'INSERT INTO appointments VALUE (%s, %s, %s, %s, %s, %s, %s)'
     
@@ -332,7 +337,7 @@ async def user_upcoming(request : Request, p_id) :
 
     return templates.TemplateResponse("userAppts.html", {"request": request, \
                                                         "appts" : f_appts,\
-                                                        "p_id" : p_id})
+                                                        "p_id" : p_id, "id" : p_id, "type" : "user"})
 
 @app.get("/user/cancel")
 async def user_cancel(request : Request, appt_id) :
@@ -374,7 +379,7 @@ async def vet_add(request : Request):
     cursor.close()
 
     # This v_id will be used for login later
-    return templates.TemplateResponse("message.html", {"request": request, "message" : f"You're In! Save your vet ID : {v_id}"})
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"You're In! Save your vet ID : {v_id}", "id" : v_id, "type" : "vet"})
 
 # To render vet login form
 @app.get("/vet/login", response_class=HTMLResponse)
@@ -447,7 +452,7 @@ async def vet_enroll(request : Request) :
     db.commit()
     cursor.close()
 
-    return templates.TemplateResponse("message.html", {"request": request, "message" : f"Successfully Enrolled! You now work in the clinic {c_id}"})
+    return templates.TemplateResponse("message.html", {"request": request, "message" : f"Successfully Enrolled! You now work in the clinic {c_id}", "id" : v_id, "type" : "vet"})
 
 # -------------------------- VACCINATION FUNCTIONS --------------------------
 
@@ -529,7 +534,8 @@ async def render_appt_add(request: Request, vet_id: str):
     cursor.close()
 
     if not pets:
-        raise HTTPException(status_code=404, detail="No pets found.")
+        #raise HTTPException(status_code=404, detail="No pets found.")
+        return templates.TemplateResponse("message.html", {"request": request, "message" : "No Pets Found :("})
     
     # Debugging information
     print("Fetched pet results:", pets)  # This should show all pet IDs as tuples in a list
@@ -621,7 +627,7 @@ async def appt_finish(request: Request, appt_id: str, vet_id: str):
     # cursor.execute(sql, (appt_id,))
     db.commit()
     cursor.close()
-    return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Finished!"})
+    return templates.TemplateResponse("message.html", {"request": request, "message" : "Appointment Finished!", "id" : vet_id, "type" : "vet"})
 
 # To delete an appointment
 @app.post("/appointment/delete")

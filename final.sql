@@ -64,7 +64,7 @@ primary key (c_id, vet_id));
 create table if not exists appointments (
 appt_id varchar(5) primary key,		-- AXXX
 c_id varchar(5),
-vet_id varchar(5),k
+vet_id varchar(5),
 pet_id varchar(5),
 appt_time time,
 appt_reason enum("Emergency", "Vaccination", "Routine"),
@@ -73,11 +73,13 @@ foreign key (c_id) references clinics(c_id) on delete cascade,
 foreign key (vet_id) references vets(vet_id) on delete cascade,
 foreign key(pet_id) references pets(pet_id) on delete cascade);
 
--- Procedure to order appointments by date and reason (Emergency > Vaccination > Routine)
+Procedure to order appointments by date and reason (Emergency > Vaccination > Routine)
+delimiter //
 create procedure GetAppts(IN in_CID varchar(5), IN in_VID varchar(5))
 begin
  select * from appointments a
- where a.c_id = 'C300' and a.vet_id = 'V500'
+ where a.c_id = in_CID 
+ and a.vet_id = in_VID
  order by appt_date, appt_reason;
 end //
 delimiter ;
